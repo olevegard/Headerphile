@@ -1,8 +1,9 @@
-// Tutorial 1
+// Tutorial 2
 // Basic SDL2 application used to create a window. 
 // Will simply spawn a window with a single background color
 // Check out headerphile.blogspot.no for more info
 // ==================================================================
+
 #include <SDL2/SDL.h>
 #include <iostream>
 
@@ -16,12 +17,17 @@ int main( int argc, char* args[] )
 	SDL_Window* window;
 	SDL_Renderer* renderer;
 
-	if ( SDL_Init( SDL_INIT_EVERYTHING ) == -1 )
+	// Initialize SDL
+	// ==========================================================
+	if ( SDL_Init( SDL_INIT_EVERYTHING ) != 0 )
 	{
+		// Something failed, print error and exit.
 		std::cout << " Failed to initialize SDL : " << SDL_GetError() << std::endl;
 		return -1;
 	}
 
+	// Create and init the window
+	// ==========================================================
 	window = SDL_CreateWindow( "Server", posX, posY, sizeX, sizeY, 0 );
 
 	if ( window == nullptr )
@@ -30,6 +36,8 @@ int main( int argc, char* args[] )
 		return -1;
 	}
 
+	// Create and init the renderer
+	// ==========================================================
 	renderer = SDL_CreateRenderer( window, -1, 0 );
 
 	if ( renderer == nullptr )
@@ -37,6 +45,9 @@ int main( int argc, char* args[] )
 		std::cout << "Failed to create renderer : " << SDL_GetError();
 		return -1;
 	}
+
+	// Render something
+	// ==========================================================
 
 	// Set size of renderer to the same as window
 	SDL_RenderSetLogicalSize( renderer, sizeX, sizeY );
