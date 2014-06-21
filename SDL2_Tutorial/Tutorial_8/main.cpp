@@ -2,7 +2,6 @@
 #include <SDL2/SDL_image.h>
 
 #include <iostream>
-#include <vector>
 
 #include "Texture.h"
 
@@ -16,9 +15,6 @@ void Render();
 void RunGame();
 
 void UpdateHandPositions();
-void SetHourPosition( int32_t time );
-void SetSecondPosition( int32_t time );
-void SetMinutePosition( int32_t time );
 
 SDL_Rect windowRect = { 0, 0, 1920, 1080 };
 
