@@ -90,6 +90,34 @@ struct TetrisPiece
 				}
 			}
 		}
+		int32_t GetLeftMostX()
+		{
+			for ( int column = 0 ; column < 4 ; ++column )
+			{
+				for ( int row = 0 ; row < 4 ; ++row )
+				{
+					if ( positions[row][column] )
+					{
+						return textures[column][row].rect.x;
+					}
+				}
+			}
+
+			return -1;
+		}
+		int32_t GetRightMostX()
+		{
+			for ( int column = 3 ; column != 0 ; --column )
+			{
+				for ( int row = 3 ; row != 0 ;  --row )
+				{
+					if ( positions[row][column] )
+						return  textures[column][row].rect.x;
+				}
+			}
+
+			return -1;
+		}
 		void Rotate()
 		{
 			// This is the tricky part. The rotation needs to work for all pieces
