@@ -52,7 +52,6 @@ void RunGame()
 
 	while ( loop )
 	{
-		board.Update();
 		auto timeNow = high_resolution_clock::now();
 
 		if ( ( timeNow - start ) >= fallTimer)

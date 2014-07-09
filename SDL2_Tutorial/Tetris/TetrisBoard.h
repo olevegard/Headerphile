@@ -7,6 +7,7 @@
 
 #include <array>
 #include <memory>
+#include <vector>
 
 struct TetrisBoard
 {
@@ -15,9 +16,49 @@ struct TetrisBoard
 		currentPiece = std::make_unique< TetrisPiece >();
 
 	}
+	void CreatePieces()
+	{
+		// Hard coded for now. This will result in a L piece
+
+		// This will produce the L-piece
+		// |=========|
+		// | - - - - |
+		// | - X - - |
+		// | - X - - |
+		// | - X X - |
+		// |=========|
+
+		{
+			PieceLayout piece;
+			piece.layout = 
+			{
+				false, true , false, false,
+				false, true , false, false,
+				false, true , true , false,
+				false, false, false, false
+			};
+
+			layouts.push_back( piece );
+		}
+		{
+			PieceLayout piece;
+			piece.layout = 
+			{
+				false , true, false, false,
+				false , true, false, false,
+				false , true, false, false,
+				false , true, false, false
+			};
+
+			layouts.push_back( piece );
+		}
+
+	}
 
 	void Init( SDL_Renderer* renderer,  const SDL_Rect &windowRect )
 	{
+		CreatePieces();
+
 		for ( int column = 0 ; column < 8 ; ++column )
 		{
 			for ( int row = 0 ; row < 15 ; ++row )
@@ -35,7 +76,10 @@ struct TetrisBoard
 	}
 	void MoveDown()
 	{
-		currentPiece->MoveDown( );
+		SDL_Rect r = currentPiece->GetRect();
+
+		if ( ( r.y + r.h ) < ( boardRect.y + boardRect.h ) )
+			currentPiece->MoveDown( );
 	}
 	void MoveRight()
 	{
@@ -95,7 +139,14 @@ struct TetrisBoard
 		SDL_RenderDrawRect( renderer, &boardRect );
 		SDL_SetRenderDrawColor( renderer, 0, 0, 0, 255 );
 	}
+	void Update( )
+	{
+		SDL_Rect r = currentPiece->GetRect();
 
+		if ( ( r.y + r.h ) >= ( boardRect.y + boardRect.h ) )
+			std::cout << "Tile at bottom\n";
+
+	}
 	SDL_Rect boardRect;
 	std::array< std::array< Texture, 15 > , 8 > textures;
 	std::unique_ptr< TetrisPiece > currentPiece;

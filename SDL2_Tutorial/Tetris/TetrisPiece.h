@@ -11,7 +11,7 @@ struct Texture
 	{
 		isSolid = solid;
 	}
-	bool GetIsSolid( )
+	bool GetIsSolid( ) const
 	{
 		return isSolid;
 	}
@@ -120,6 +120,9 @@ struct TetrisPiece
 		}
 		void UpdateRectPosition()
 		{
+			pieceOuterRect.x = textures[0][0].rect.x;
+			pieceOuterRect.y = textures[0][0].rect.y;
+
 			pieceRect.x = textures[0][0].rect.x;
 			pieceRect.y = textures[0][0].rect.y;
 		}
@@ -128,11 +131,16 @@ struct TetrisPiece
 			for ( int column = 0 ; column < 4 ; ++column )
 			{
 				for ( int row = 0 ; row < 4 ; ++row )
-					textures[column][row].Render( renderer );
+					if ( textures[column][row].GetIsSolid() )
+						textures[column][row].Render( renderer );
 			}
 
 			SDL_SetRenderDrawColor( renderer, 255, 255, 0, 255 );
+			SDL_RenderDrawRect( renderer, &pieceOuterRect );
+
+			SDL_SetRenderDrawColor( renderer, 0, 255, 0, 255 );
 			SDL_RenderDrawRect( renderer, &pieceRect );
+
 			SDL_SetRenderDrawColor( renderer, 0, 0, 0, 255 );
 		}
 		int32_t GetLeftMostX()
@@ -150,12 +158,12 @@ struct TetrisPiece
 		}
 		void MoveDown()
 		{
-			return;
 			for ( auto &p : textures )
 				for ( auto &q : p )
 					q.MoveDown();
 
 			pieceRect.y += ( blockSize + blockMargin );
+			pieceOuterRect.y = pieceOuterRect.y += ( blockSize + blockMargin );
 		}
 		void MoveLeft()
 		{
@@ -164,6 +172,7 @@ struct TetrisPiece
 					q.MoveLeft();
 
 			pieceRect.x -= ( blockSize + blockMargin );
+			pieceOuterRect.x -= ( blockSize + blockMargin );
 		}
 		void MoveRight()
 		{
@@ -172,6 +181,7 @@ struct TetrisPiece
 					q.MoveRight();
 
 			pieceRect.x += ( blockSize + blockMargin );
+			pieceOuterRect.x += ( blockSize + blockMargin );
 		}
 		int32_t GetRightMostX()
 		{
@@ -225,15 +235,15 @@ struct TetrisPiece
 
 			AdjustRect();
 
-			if ( pieceRect.x < bounds.x || ( pieceRect.x + pieceRect.w ) > ( bounds.x + bounds.w ) )
+			if ( IsOutOfBounds( bounds ) )
 			{
-				std::cout << "Out of bounds!\n";
-
 				for ( int column = 0 ; column < 4 ; ++column )
 				{
 					for ( int row = 0 ; row < 4 ; ++row )
 						textures[column][row] = copied[column][row];
 				}
+
+				AdjustRect();
 			}
 		}
 		SDL_Rect GetRect()
@@ -260,36 +270,60 @@ struct TetrisPiece
 
 			pieceRect.w = textures[3][3].rect.x + textures[3][3].rect.w - pieceRect.x;
 			pieceRect.h = textures[3][3].rect.y + textures[3][3].rect.h - pieceRect.y;
+
+			pieceOuterRect.w = textures[3][3].rect.x + textures[3][3].rect.w - pieceRect.x;
+			pieceOuterRect.h = textures[3][3].rect.y + textures[3][3].rect.h - pieceRect.y;
 		}
 		void AdjustRect()
 		{
-			int32_t min = 3;
-			int32_t max = 0;
+			int32_t minX = 3;
+			int32_t maxX = 0;
+
+			int32_t minY = 3;
+			int32_t maxY = 0;
 			for ( int column = 0 ; column < 4 ; ++column )
 			{
 				for ( int row = 0 ; row < 4 ; ++row )
 				{
 					if ( textures[column][row].GetIsSolid( ) )
 					{
-						if ( column > max )
-							max = column;
+						maxX = std::max( column, maxX );
+						minX = std::min( column, minX );
 
-						if ( column < min )
-							min = column;
 
-						std::cout << column << ", " << row << " is solid\n";
+						maxY = std::max( row, maxY );
+						minY = std::min( row, minY );
 					}
 				}
 			}
 
-			std::cout << "min/max : " << min << ", " << max << std::endl;
-
-			pieceRect.x = textures[min][0].rect.x;
-			pieceRect.w = ( textures[max][0].rect.x + textures[max][0].rect.w ) - pieceRect.x;
-
+			RecalculateRect( minX, maxX, minY, maxY );
 		}
+		void RecalculateRect( int32_t minX, int32_t maxX, int32_t minY,  int32_t maxY )
+		{
+			pieceRect.x = textures[minX][0].rect.x;
+			pieceRect.w = ( textures[maxX][0].rect.x + textures[maxX][0].rect.w ) - pieceRect.x;
+
+			pieceRect.y = textures[0][minY].rect.y;
+			pieceRect.h = ( textures[0][maxY].rect.y + textures[0][maxY].rect.h ) - pieceRect.y;
+		}
+		bool IsOutOfBounds( const SDL_Rect &boardRect )
+		{
+			if ( pieceRect.x < boardRect.x )
+				return true;
+
+			if ( ( pieceRect.x + pieceRect.w ) > ( boardRect.x + boardRect.w ) )
+				return true;
+
+			if ( ( pieceRect.y + pieceRect.y ) > ( boardRect.y + boardRect.h ) )
+				return true;
+
+			return false;
+		}
+
 		int32_t blockSize;
 		int32_t blockMargin;
 		SDL_Rect pieceRect;
+		SDL_Rect pieceOuterRect;
 		std::array< std::array< Texture, 4 > , 4 > textures;
 };
