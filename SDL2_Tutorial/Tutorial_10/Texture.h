@@ -125,6 +125,12 @@ struct FontTexture : Texture
 		ss << str << " : " << value;
 		RenderText_Solid( renderer, ss.str() );
 	}
+	void RenderValue( SDL_Renderer* renderer, const std::string &str, double value )
+	{
+		std::stringstream  ss;
+		ss << str << " : " << value;
+		RenderText_Solid( renderer, ss.str() );
+	}
 	private:
 	void ConvertSuface( SDL_Renderer* renderer, SDL_Surface* surface )
 	{

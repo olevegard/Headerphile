@@ -40,6 +40,7 @@ SDL_Point windowMiddle;
 
 SDL_Window* window;
 SDL_Renderer* renderer;
+
 TTF_Font* font;
 TTF_Font* bigFont;
 
@@ -51,10 +52,10 @@ Texture background;
 Texture topBar;
 Texture bottomBar;
 
-FontTexture points;
-FontTexture backgroundText;
-FontTexture start;
-FontTexture finish;
+FontTexture fpsCounter;
+FontTexture textSolid;
+FontTexture textShaded;
+FontTexture textBlended;
 
 std::vector< Enemy > enemies;
 
@@ -74,7 +75,10 @@ void RunGame()
 	while ( !quit )
 	{
 		HandleInput();
-		UpdateObjects( GetDelta() );
+
+		double delta = GetDelta();
+		fpsCounter.RenderValue( renderer, "FPS", 1.0 / delta );
+		UpdateObjects( delta );
 
 		Render();
 	}
@@ -87,7 +91,7 @@ double GetDelta()
 	auto timeCurrent = high_resolution_clock::now();
 
 	// Compare the two to create time_point containing delta time in nanosecnds
-	auto timeDiff = duration_cast< nanoseconds >( timeCurrent - timePrev );
+	nanoseconds timeDiff = duration_cast< nanoseconds >( timeCurrent - timePrev );
 
 	// Get the tics as a variable
 	double delta = timeDiff.count();
@@ -143,28 +147,30 @@ void UpdateObjects( double delta )
 }
 void InitializeObjects()
 {
-	start.Init( bigFont, { 255, 255, 0, 255 }, { 0, 0, 0, 255 } ); 
-	start.RenderText_Shaded( renderer, "Shaded" );
-	start.CenterAtPoint( { windowMiddle.x, windowMiddle.y + 160 } );
+	textShaded.Init( bigFont, { 255, 0, 255, 255 }, { 0, 0, 255, 255 } ); 
+	textShaded.RenderText_Shaded( renderer, "Shaded" );
+	textShaded.CenterAtPoint( windowMiddle );
 
-	finish.Init( bigFont, { 255, 255, 0, 255 }, { 0, 0, 0, 255 } );
-	finish.RenderText_Blended( renderer, "Blended" );
-	finish.CenterAtPoint( { windowMiddle.x, windowMiddle.y - 160 } );
+	textBlended.Init( bigFont, { 255, 255, 0, 255 }, { 0, 0, 255, 255 } );
+	textBlended.RenderText_Blended( renderer, "Blended" );
+	textBlended.CenterAtPoint( { windowMiddle.x, windowMiddle.y - 160 } );
 
-	points.Init( font, { 255, 255, 0, 255 }, { 0, 0, 0, 255 } ); 
-	points.SetPos( { 0, 0 } );
-	points.RenderValue( renderer, "Points", 0 );
+	textSolid.Init( bigFont, { 255, 255, 255, 255 }, { 0, 0, 0, 255 } ); 
+	textSolid.RenderText_Solid( renderer, "Solid" );
+	textSolid.CenterAtPoint( { windowMiddle.x, windowMiddle.y + 160 } );
 
 	background.LoadTexture( renderer, "background_600x800.png" );
 
-	backgroundText.Init( bigFont, { 255, 255, 255, 255 }, { 0, 0, 0, 255 } ); 
-	backgroundText.RenderText_Solid( renderer, "Solid" );
-	backgroundText.CenterAtPoint( windowMiddle );
+	fpsCounter.Init( font, { 255, 255, 0, 255 }, { 0, 0, 0, 255 } ); 
+	fpsCounter.SetPos( { 0, 0 } );
+	fpsCounter.RenderValue( renderer, "FPS", 0 );
 
 	bottomBar.LoadTexture( renderer, "bar_600x40.png" );
 	bottomBar.SetPos( { 0, windowRect.h - 40 } );
 
 	topBar.LoadTexture( renderer, "bar_600x40.png" );
+
+	player.LoadTexture( renderer, "player.png" );
 
 	AddEnemies( 15 );
 }
@@ -196,10 +202,10 @@ void Render()
 	SDL_RenderClear( renderer );
 
 	background.Render( renderer );
-	backgroundText.Render( renderer );
 
-	start.Render( renderer );
-	finish.Render( renderer );
+	textSolid.Render( renderer );
+	textShaded.Render( renderer );
+	textBlended.Render( renderer );
 
 	for (  auto &p : enemies )
 		p.Render( renderer );
@@ -207,7 +213,7 @@ void Render()
 	topBar.Render( renderer );
 	bottomBar.Render( renderer );
 	player.Render( renderer );
-	points.Render ( renderer );
+	fpsCounter.Render ( renderer );
 
 	// Render the changes above
 	SDL_RenderPresent( renderer);
@@ -251,7 +257,7 @@ bool SetupTTF( const std::string &fontName)
 		return false;
 	}
 
-	points.Init( font, { 255, 0, 255, 255 }, { 0, 255, 0, 255 } );
+	fpsCounter.Init( font, { 255, 0, 255, 255 }, { 0, 255, 0, 255 } );
 
 	return true;
 }
@@ -267,7 +273,6 @@ bool InitSDL()
 }
 bool CreateWindow()
 {
-	//window = SDL_CreateWindow( "Server", posX, posY, sizeX, sizeY, 0 );
 	window = SDL_CreateWindow( "Server", windowRect.x, windowRect.y, windowRect.w, windowRect.h, 0 );
 
 	if ( window == nullptr )
@@ -280,7 +285,7 @@ bool CreateWindow()
 }
 bool CreateRenderer()
 {
-	renderer = SDL_CreateRenderer( window, -1, 0 );
+	renderer = SDL_CreateRenderer( window, -1, SDL_RENDERER_ACCELERATED );
 
 	if ( renderer == nullptr )
 	{
