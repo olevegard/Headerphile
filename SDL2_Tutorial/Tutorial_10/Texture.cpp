@@ -8,8 +8,12 @@ Texture::Texture()
 	,	y( 0.0 )
 		,	rect( { 0, 0, 0, 0 } )
 ,	angle( 0.0 )
-
 {
+}
+Texture::~Texture()
+{
+	//SDL_DestroyTexture( texture );
+	//
 }
 // Initializes a texture, including size and position
 void Texture::LoadTexture( SDL_Renderer *renderer, const std::string &str )
@@ -43,6 +47,10 @@ SDL_Rect Texture::GetRect() const
 {
 	return rect;
 }
+Speed Texture::GetSpeed( ) const
+{
+	return speed;
+}
 void Texture::SetRect( SDL_Rect r )
 {
 	x = r.x;
@@ -66,9 +74,21 @@ void Texture::SetSpeed( Speed s )
 	speed.x = s.x;
 	speed.y = s.y;
 }
-Speed Texture::GetSpeed( ) const
+void Texture::SetTexture( SDL_Texture *text )
 {
-	return speed;
+	SDL_DestroyTexture( texture );
+
+	texture = text;
+	CalculateSize( );
+}
+void Texture::SetTexture( SDL_Renderer* renderer, SDL_Surface* surface )
+{
+	ConvertSuface( renderer, surface );
+}
+void Texture::CenterAtPoint( const SDL_Point &p )
+{
+	rect.x = p.x - ( rect.w * 0.5 );
+	rect.y = p.y - ( rect.h * 0.5 );
 }
 // Just a wrapper to make our lives easier 
 bool Texture::CheckCollision( const Texture &other ) const
@@ -155,4 +175,17 @@ void Texture::CalculateCenter( )
 {
 	center.x = rect.x + ( rect.w * 0.5 );
 	center.y = rect.y + ( rect.h * 0.5 );
+}
+void Texture::ConvertSuface( SDL_Renderer* renderer, SDL_Surface* surface )
+{
+	if ( surface == nullptr )
+	{
+		std::cout << "Texture creation from surface failed|\n";
+		std::cout << "\tERROR: " << SDL_GetError() << std::endl;
+	}
+
+	SDL_Texture* texture = SDL_CreateTextureFromSurface( renderer, surface );
+
+	SetTexture( texture );
+	SDL_FreeSurface( surface );
 }

@@ -5,11 +5,11 @@
 #include <vector>
 #include <iostream>
 
-#include <chrono>
-
+#include "Timer.h"
 #include "Enemy.h"
 #include "Player.h"
 #include "Texture.h"
+#include "Texture_Text.h"
 
 // Setup
 bool InitEverything();
@@ -20,10 +20,6 @@ void SetupRenderer();
 
 // Our new function for setting uo SDL_TTF
 bool SetupTTF( const std::string &fontName );
-
-// Timing
-using namespace std::chrono; // Adding this means we don't have to add std::chrono in front of everything
-double GetDelta();
 
 void InitializeObjects();
 void AddEnemies( int32_t count );
@@ -52,14 +48,14 @@ Texture background;
 Texture topBar;
 Texture bottomBar;
 
-FontTexture fpsCounter;
-FontTexture textSolid;
-FontTexture textShaded;
-FontTexture textBlended;
+Texture_Text fpsCounter;
+Texture_Text textSolid;
+Texture_Text textShaded;
+Texture_Text textBlended;
 
 std::vector< Enemy > enemies;
 
-auto timePrev = high_resolution_clock::now();
+Timer timer;
 
 int main( int argc, char* args[] )
 {
@@ -67,7 +63,7 @@ int main( int argc, char* args[] )
 		return -1;
 
 	InitializeObjects();
-	
+
 	RunGame();
 }
 void RunGame()
@@ -76,32 +72,14 @@ void RunGame()
 	{
 		HandleInput();
 
-		double delta = GetDelta();
-		fpsCounter.RenderValue( renderer, "FPS", 1.0 / delta );
+		fpsCounter.RenderValue( renderer, "FPS", timer.GetAverageFPS() );
+		double delta = timer.GetDelta();
 		UpdateObjects( delta );
 
 		Render();
 	}
 }
-// Returns time since last time this function was called in seconds with nanosecond precision
-double GetDelta()
-{
-	// Gett current time as a std::chrono::time_point
-	// which basically contains info about the current point in time
-	auto timeCurrent = high_resolution_clock::now();
 
-	// Compare the two to create time_point containing delta time in nanosecnds
-	nanoseconds timeDiff = duration_cast< nanoseconds >( timeCurrent - timePrev );
-
-	// Get the tics as a variable
-	double delta = timeDiff.count();
-
-	// Turn nanoseconds into seconds
-	delta /= 1000000000;
-
-	timePrev = timeCurrent;
-	return delta;
-}
 void HandleInput()
 {
 	SDL_Event event;
@@ -113,6 +91,9 @@ void HandleInput()
 		{
 			switch ( event.key.keysym.sym )
 			{
+				case SDLK_ESCAPE:
+					quit = true;
+					break;
 				case SDLK_RIGHT:
 					player.MoveRight( );
 					break;
@@ -163,7 +144,7 @@ void InitializeObjects()
 
 	fpsCounter.Init( font, { 255, 255, 0, 255 }, { 0, 0, 0, 255 } ); 
 	fpsCounter.SetPos( { 0, 0 } );
-	fpsCounter.RenderValue( renderer, "FPS", 0 );
+	fpsCounter.RenderText_Solid( renderer, "FPS : - " );
 
 	bottomBar.LoadTexture( renderer, "bar_600x40.png" );
 	bottomBar.SetPos( { 0, windowRect.h - 40 } );
@@ -249,7 +230,7 @@ bool SetupTTF( const std::string &fontName)
 	}
 
 	font = TTF_OpenFont( fontName.c_str(), 38 );
-	bigFont = TTF_OpenFont( fontName.c_str(), 64 );
+	bigFont = TTF_OpenFont( fontName.c_str(), 90 );
 	
 	if ( font == nullptr )
 	{
