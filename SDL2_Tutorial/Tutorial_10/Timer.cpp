@@ -1,11 +1,22 @@
 #include "Timer.h"
 
+#include <iostream>
+
+// A typedef for seconds represented as a floating point number
+// Some valuse
+// 1 nanosecon 0.000 000 001.
+// 42 micorseconds 0.000 042
+// 16 milliseconds 0.016
+// Had we used the predefined duration, seconds ( which uses an integer type ) we would get 0 for the above valuses
+// The duration saves us the trouble of coverting to second.
+typedef duration< double > seconds_f;
+
 Timer::Timer()
 	:	timePrev( high_resolution_clock::now() )
 	,	timeStart( steady_clock::now() )
 	,	frameCount( 0 )
 	,	nextFPSUpdate( 1000 )
-		,	fpsUpdateInterval( 500 )
+	,	fpsUpdateInterval( 500 )
 {
 }
 // Returns time since last time this function was called in seconds with nanosecond precision
@@ -15,20 +26,10 @@ double Timer::GetDelta()
 	// which basically contains info about the current point in time
 	auto timeCurrent = high_resolution_clock::now();
 
-	// Compare the two to create time_point containing delta time in nanosecnds
-	nanoseconds timeDiff = duration_cast< nanoseconds >( timeCurrent - timePrev );
+	seconds_f delta( timeCurrent - timePrev );
 
-	// Get the tics as a variable
-	double delta = timeDiff.count();
-
-	// Turn nanoseconds into seconds
-	// Note : we can't use duration_cast to seconds here because then we'd
-	//	loose the precisioon and be left with whole seconds
-	//	( which would be 0 every frame, which means no movement can occur at all )
-	delta /= 1000000000;
-
-	timePrev = timeCurrent;
-	return delta;
+	timePrev = high_resolution_clock::now();
+	return delta.count();
 }
 int32_t Timer::GetAverageFPS()
 {
@@ -50,7 +51,6 @@ void Timer::RecalculateFPS( const nanoseconds &runningTime )
 	int64_t runningTimeSec = runningTime.count() / 1000000000;
 	currentFPS = frameCount / runningTimeSec;
 }
-
 // We need to reduce the interval at which we update the average FPS display because
 //	otherwise we'd be wastng resources on recreating the text texture thousands of time every sevcond
 //
