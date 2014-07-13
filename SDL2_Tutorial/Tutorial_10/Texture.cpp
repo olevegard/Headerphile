@@ -18,11 +18,7 @@ Texture::~Texture()
 // Initializes a texture, including size and position
 void Texture::LoadTexture( SDL_Renderer *renderer, const std::string &str )
 {
-	SDL_Surface* surface = IMG_Load( str.c_str() );
-
-	texture = SDL_CreateTextureFromSurface( renderer, surface );
-
-	SDL_FreeSurface( surface );
+	texture = IMG_LoadTexture( renderer, str.c_str() );
 
 	CalculateSize( );
 }
