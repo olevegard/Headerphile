@@ -1,19 +1,20 @@
 #include "Texture.h"
 
-#include <iostream>
+#include <SDL2/SDL_image.h>
 
+#include <iostream>
+#include <sstream>
 
 Texture::Texture()
 	:	x( 0.0 )
 	,	y( 0.0 )
-		,	rect( { 0, 0, 0, 0 } )
-,	angle( 0.0 )
+	,	rect( { 0, 0, 0, 0 } )
+	,	angle( 0.0 )
 {
 }
 Texture::~Texture()
 {
 	//SDL_DestroyTexture( texture );
-	//
 }
 // Initializes a texture, including size and position
 void Texture::LoadTexture( SDL_Renderer *renderer, const std::string &str )
@@ -86,12 +87,10 @@ void Texture::CenterAtPoint( const SDL_Point &p )
 	rect.x = p.x - ( rect.w * 0.5 );
 	rect.y = p.y - ( rect.h * 0.5 );
 }
-// Just a wrapper to make our lives easier 
 bool Texture::CheckCollision( const Texture &other ) const
 {
 	return CheckCollision( other.GetRect() );
 }
-// This method is the same as in part 7
 bool Texture::CheckCollision( const SDL_Rect &other ) const
 {
 	// Find edges of rect1
@@ -156,14 +155,7 @@ void Texture::MoveDown()
 }
 void Texture::CalculateSize( )
 {
-	// Find width and height of texture
-	int32_t width = 0;
-	int32_t height = 0;
-	SDL_QueryTexture( texture, nullptr, nullptr, &width, &height );
-
-	// Set size
-	rect.w = width;
-	rect.h = height;
+	SDL_QueryTexture( texture, nullptr, nullptr, &rect.w, &rect.h );
 
 	CalculateCenter( );
 }

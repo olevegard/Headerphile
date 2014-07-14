@@ -1,8 +1,10 @@
 // Texture_Text.h - headerphile.blogspot.no
 // An overloaded Texture class that's used for rendeing text
 // Stores fonts and colors for rendering
-//
+// Also stores previous rendered value which means we won't re-render the same value
 #pragma once
+
+#include <SDL2/SDL_ttf.h>
 
 #include "Texture.h"
 

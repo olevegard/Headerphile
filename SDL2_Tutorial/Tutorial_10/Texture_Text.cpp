@@ -1,5 +1,7 @@
 #include "Texture_Text.h"
 
+#include <sstream>
+
 Texture_Text::Texture_Text()
 	:	Texture_Text( nullptr, { 0, 0, 0, 255 }, { 255, 255, 255, 255 } )
 {

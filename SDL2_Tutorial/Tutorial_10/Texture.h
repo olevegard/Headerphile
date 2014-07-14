@@ -5,14 +5,8 @@
 #pragma once
 
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
 
 #include <string>
-#include <iostream>
-#include <sstream>
-
-#include "Texture.h"
 
 struct Speed
 {
@@ -31,30 +25,30 @@ struct Texture
 	void Render( SDL_Renderer* renderer );
 	void Update( double delta );
 
-	// Just a wrapper to make our lives easier 
+	// Collision detection
 	bool CheckCollision( const Texture &other ) const;
-
-	// This method is the same as in part 7
 	bool CheckCollision( const SDL_Rect &other ) const;
-
 	bool IsOutOfBounds( const SDL_Rect &windowSize ) const;
 
+	// Setters
 	void SetRect( SDL_Rect r );
 	void SetPos( SDL_Point p );
 	void SetSpeed( Speed s );
-	void SetTexture( SDL_Texture *text );
-	void SetTexture( SDL_Renderer* renderer, SDL_Surface* surface );
-
-	void CenterAtPoint( const SDL_Point &p );
 
 	void MoveLeft();
 	void MoveRight();
 	void MoveUp();
 	void MoveDown();
+	void CenterAtPoint( const SDL_Point &p );
+
+	// Converts surface to SDL_Texture* and call SetTextre() with that SDL_Texture*
+	void SetTexture( SDL_Renderer* renderer, SDL_Surface* surface );
+
+	// Frees previous and sets texture to text
+	void SetTexture( SDL_Texture *text );
 
 	SDL_Rect GetRect() const;
 	Speed GetSpeed( ) const;
-
 	private:
 	void CalculateSize( );
 	void CalculateCenter( );

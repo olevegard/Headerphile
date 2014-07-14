@@ -1,15 +1,23 @@
+// SLD2 Tutorial Part 10 - Headerphile.blogspot.no
+// Text renderering
+// Extends our game by adding text
+// Compile  : clang++ main.cpp Texture.cpp Teure_Text.cpp Timer.cpp -std=c++1y -lSDL2 -lSDL2_image -lSDL2_ttf -o Game
+// Run      : ./Game
+// Updated : Texture.h/.cpp, Texture_Text.h/.cpp, Timer.h/.cpp
+
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_image.h>
 
 #include <vector>
 #include <iostream>
 
-#include "Timer.h"
+#include "Timer.h"			// Delta time, average FPS calculation
+#include "Texture.h"		// Regular textures ( Enemy, Player )
+#include "Texture_Text.h"	// Text textures ( 'solid', 'blended', 'shaded' ), average FPS display
+
 #include "Enemy.h"
 #include "Player.h"
-#include "Texture.h"
-#include "Texture_Text.h"
 
 // Setup
 bool InitEverything();
@@ -17,9 +25,7 @@ bool InitSDL();
 bool CreateWindow();
 bool CreateRenderer();
 void SetupRenderer();
-
-// Our new function for setting uo SDL_TTF
-bool SetupTTF( const std::string &fontName );
+bool SetupTTF( const std::string &fontName ); // Our new function for setting uo SDL_TTF
 
 void InitializeObjects();
 void AddEnemies( int32_t count );
@@ -65,6 +71,10 @@ int main( int argc, char* args[] )
 	InitializeObjects();
 
 	RunGame();
+
+	// Free our fonts
+	TTF_CloseFont( font );
+	TTF_CloseFont( bigFont );
 }
 void RunGame()
 {
@@ -128,7 +138,7 @@ void UpdateObjects( double delta )
 }
 void InitializeObjects()
 {
-	textShaded.Init( bigFont, { 255, 0, 255, 255 }, { 0, 0, 255, 255 } ); 
+	textShaded.Init( bigFont, { 255, 0, 255, 255 }, { 0, 0, 255, 255 } );
 	textShaded.RenderText_Shaded( renderer, "Shaded" );
 	textShaded.CenterAtPoint( windowMiddle );
 

@@ -1,7 +1,5 @@
 #include "Timer.h"
 
-#include <iostream>
-
 // A typedef for seconds represented as a floating point number
 // Some valuse
 // 1 nanosecon 0.000 000 001.
