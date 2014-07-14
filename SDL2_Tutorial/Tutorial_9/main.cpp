@@ -82,17 +82,14 @@ double GetDelta()
 	// which basically contains info about the current point in time
 	auto timeCurrent = high_resolution_clock::now();
 
-	// Compare the two to create time_point containing delta time in nanosecnds
-	auto timeDiff = duration_cast< nanoseconds >( timeCurrent - timePrev );
+	// Create a duration that stores seconds as double 
+	duration< double, std::ratio< 1, 1 > > timeDiff;
 
-	// Get the tics as a variable
-	double delta = timeDiff.count();
-
-	// Turn nanoseconds into seconds
-	delta /= 1000000000;
+	// And assign it to the difference between timeCurrent and timePrev ( delta time )
+	timeDiff = ( timeCurrent - timePrev );
 
 	timePrev = timeCurrent;
-	return delta;
+	return timeDiff.count();
 }
 void HandleInput()
 {
