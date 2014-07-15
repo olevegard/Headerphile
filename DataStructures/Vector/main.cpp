@@ -103,7 +103,7 @@ bool InitEverything()
 	windowMiddle.x = static_cast< uint32_t > ( windowRect.w * 0.5 );
 	windowMiddle.y = static_cast< uint32_t > ( windowRect.h * 0.5 );
 
-	container.Init( "sketchy.ttf" );
+	container.Init( "sketchy.ttf", 38 );
 	container.AddObject( renderer, 24 );
 	container.AddObject( renderer, 42 );
 	container.AddObject( renderer, 2442 );

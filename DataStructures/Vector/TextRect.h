@@ -12,8 +12,8 @@ class TextRect : public Texture_Text
 		rect.x = rect_.x;
 		rect.y = rect_.y;
 
-		rect.w += 20;
-		rect.h += 20;
+		rect.w += 5;
+		rect.h += 5;
 
 		CheckRect();
 	}

@@ -14,7 +14,6 @@ struct Container
 		{
 			// Free our fonts
 			TTF_CloseFont( font );
-			TTF_CloseFont( bigFont );
 		}
 		void Render( SDL_Renderer* renderer )
 		{
@@ -28,10 +27,9 @@ struct Container
 			
 			}
 		}
-		bool Init( const std::string &fontName )
+		bool Init( const std::string &fontName, int32_t fontSize )
 		{
-			font = TTF_OpenFont( fontName.c_str(), 38 );
-			bigFont = TTF_OpenFont( fontName.c_str(), 90 );
+			font = TTF_OpenFont( fontName.c_str(), fontSize );
 
 			if ( font == nullptr )
 			{
@@ -39,12 +37,14 @@ struct Container
 				return false;
 			}
 
+			container.h = TTF_FontHeight( font ) + 15;
+
 			return true;
 		}
 		void AddObject( SDL_Renderer* renderer, int32_t value )
 		{
 			TextRect item;
-			SDL_Rect r( { container.x + container.w, container.y + 10, 20, 20 } );
+			SDL_Rect r( { container.x + container.w, container.y + 5, 0, 0 } );
 
 			item.Init( font, { 255, 255, 0, 255 }, { 0, 0, 0, 255 } ); 
 			item.RenderValue( renderer, value );
@@ -55,7 +55,6 @@ struct Container
 		}
 	private:
 		TTF_Font* font;
-		TTF_Font* bigFont;
 		std::vector< TextRect > items;
 		SDL_Point itemSize = { 66, 66 }; 
 		SDL_Rect container = { 10, 10, 10, 85 };
