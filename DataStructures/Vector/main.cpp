@@ -46,31 +46,23 @@ int main( int argc, char* args[] )
 }
 void RunGame()
 {
+	container.AddObject( 1 );
+	container.AddObject( 2 );
+	container.AddObject( 3 );
+	container.AddObject( 4 );
+	container.AddObject( 5 );
+
 	while ( !quit )
 	{
+
 		HandleInput();
 
-		if ( counter == 2 )
+		if ( counter == 5 )
 		{
-			container.AddObject( 44,4 );
-			++counter;
+			container.AddObject( 33, 1 );
 		}
-		if ( counter == 1 )
-		{
-			container.AddObject( 2 );
 
-			container.AddObject( 3 );
-			container.AddObject( 4 );
-
-			container.AddObject( 5 );
-			container.AddObject( 6 );
-			container.AddObject( 55, 5 );
-			++counter;
-		}
-		if ( counter == 0 )
-		{
-			container.AddObject( 1 );
-		}
+		++counter;
 
 		Render();
 	}

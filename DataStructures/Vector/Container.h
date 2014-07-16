@@ -3,6 +3,12 @@
 #include <vector>
 #include <SDL2/SDL_ttf.h>
 
+#include <chrono>
+#include <thread>
+
+using namespace std::chrono;
+
+
 #include "TextRect.h"		// TextTexture with a surrounding rect
 #include "Texture.h"		// Regular textures ( Enemy, Player )
 #include "Texture_Text.h"	// Text textures ( 'solid', 'blended', 'shaded' ), average FPS display
@@ -40,7 +46,6 @@ struct Container
 			}
 
 			SDL_RenderPresent( renderer);
-			std::cin.ignore();
 		}
 		bool Init( SDL_Renderer* renderer_, const std::string &fontName, int32_t fontSize )
 		{
@@ -82,7 +87,15 @@ struct Container
 
 			//data.insert( std::begin( data) + index, CreateItem( renderer, value ) );
 			std::cout << "Setting item " << size << " data size " << data.size() << std::endl;
-			data[size].RenderValue( renderer, value );
+			for ( auto i = size  - 1; i >= index ; --i )
+			{
+				std::swap( data[i], data[ i +1] );
+				Render();
+
+				std::this_thread::sleep_for( milliseconds( 500 ) );
+			}
+
+			data[index].RenderValue( renderer, value );
 		}
 		void Reserve( int32_t newCapacity )
 		{
