@@ -72,9 +72,7 @@ struct Container
 				Reserve( capacity + 5 );
 
 			// Add item to last free pos ( this is the same as push_back )
-			data[ size ].RenderValue( renderer, value );
-			data[ size ].SetBGColor( { 255, 0, 0, 255 } );
-			++size;
+			data[ size++ ].RenderValue( renderer, value );
 		}
 		void AddObject( int32_t value, int32_t index )
 		{
@@ -130,7 +128,6 @@ struct Container
 			TextRect item;
 
 			item.Init( font, { 255, 255, 0, 255 }, { 0, 0, 0, 255 } ); 
-			item.SetBGColor( { 0, 0, 255, 255 } );
 			item.SetOuterRect( originalRect );
 
 			container.w += marginSize.x + itemSize.x;

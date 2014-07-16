@@ -5,7 +5,6 @@ class TextRect : public Texture_Text
 	public:
 	TextRect()
 		:	rect( { 0,0,0,0 } )
-		,	bgColor( { 255, 0, 0, } )
 		,	emptyItem( true )
 	{
 	}
@@ -53,8 +52,11 @@ class TextRect : public Texture_Text
 	}
 	void Render( SDL_Renderer* renderer ) const
 	{
-		SDL_SetRenderDrawColor( renderer, bgColor.r, bgColor.g, bgColor.b, bgColor.a );
-		SDL_RenderFillRect( renderer, &rect );
+		if ( !emptyItem )
+		{
+			SDL_SetRenderDrawColor( renderer, 255, 0, 0, 255 );
+			SDL_RenderFillRect( renderer, &rect );
+		}
 
 		SDL_SetRenderDrawColor( renderer, 255, 255, 255, 255 );
 		SDL_RenderDrawRect( renderer, &rect );
@@ -78,13 +80,8 @@ class TextRect : public Texture_Text
 	{
 		return Texture::GetTexture();
 	}
-	void SetBGColor( SDL_Color color )
-	{
-		bgColor = color;
-	}
 
 	private:
 	bool emptyItem;
-	SDL_Color bgColor;
 	SDL_Rect rect;
 };
