@@ -5,10 +5,19 @@ class TextRect : public Texture_Text
 	public:
 	TextRect()
 		:	rect( { 0,0,0,0 } )
+		,	bgColor( { 255, 0, 0, } )
+		,	emptyItem( true )
 	{
 	}
 	void SetOuterRect( SDL_Rect rect_ )
 	{
+		rect = rect_;
+
+		SDL_Point p;
+		p.x = rect.x + ( rect.w * 0.5 );
+		p.y = rect.y + ( rect.h * 0.5 );
+		CenterAtPoint( p );
+		/*
 		rect.x = rect_.x;
 		rect.y = rect_.y;
 
@@ -16,6 +25,7 @@ class TextRect : public Texture_Text
 		rect.h += 5;
 
 		CheckRect();
+		*/
 	}
 	void CheckRect( )
 	{
@@ -36,9 +46,14 @@ class TextRect : public Texture_Text
 		p.y = rect.y + ( rect.h * 0.5 );
 		CenterAtPoint( p );
 	}
+	void IncrementX( int32_t x )
+	{
+		rect.x += x;
+		Texture::IncrementX( x );
+	}
 	void Render( SDL_Renderer* renderer ) const
 	{
-		SDL_SetRenderDrawColor( renderer, 255, 0, 0, 255 );
+		SDL_SetRenderDrawColor( renderer, bgColor.r, bgColor.g, bgColor.b, bgColor.a );
 		SDL_RenderFillRect( renderer, &rect );
 
 		SDL_SetRenderDrawColor( renderer, 255, 255, 255, 255 );
@@ -48,16 +63,28 @@ class TextRect : public Texture_Text
 
 		Texture_Text::Render( renderer );
 	}
+
 	void RenderValue( SDL_Renderer* renderer, int32_t value )
 	{
 		Texture_Text::RenderValue( renderer, value );
-		CheckRect( );
+		emptyItem = false;
+		CenterAtPoint( { rect.x + static_cast< int32_t >( rect.w * 0.5 ), rect.y + static_cast< int32_t >( rect.h * 0.5 ) } );
 	}
 	SDL_Rect GetOuterRect()
 	{
 		return rect;
 	}
+	SDL_Texture* GetTexture() 
+	{
+		return Texture::GetTexture();
+	}
+	void SetBGColor( SDL_Color color )
+	{
+		bgColor = color;
+	}
 
 	private:
+	bool emptyItem;
+	SDL_Color bgColor;
 	SDL_Rect rect;
 };

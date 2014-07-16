@@ -76,7 +76,7 @@ void Texture::SetSpeed( Speed s )
 void Texture::SetTexture( SDL_Texture *text )
 {
 	if ( texture )
-	SDL_DestroyTexture( texture );
+		SDL_DestroyTexture( texture );
 
 	texture = text;
 	CalculateSize( );

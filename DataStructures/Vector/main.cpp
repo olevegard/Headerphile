@@ -33,6 +33,7 @@ SDL_Renderer* renderer;
 
 Container container;
 
+int counter = 0;
 bool quit = false;
 
 int main( int argc, char* args[] )
@@ -48,6 +49,28 @@ void RunGame()
 	while ( !quit )
 	{
 		HandleInput();
+
+		if ( counter == 2 )
+		{
+			container.AddObject( 44,4 );
+			++counter;
+		}
+		if ( counter == 1 )
+		{
+			container.AddObject( 2 );
+
+			container.AddObject( 3 );
+			container.AddObject( 4 );
+
+			container.AddObject( 5 );
+			container.AddObject( 6 );
+			container.AddObject( 55, 5 );
+			++counter;
+		}
+		if ( counter == 0 )
+		{
+			container.AddObject( 1 );
+		}
 
 		Render();
 	}
@@ -75,13 +98,7 @@ void HandleInput()
 }
 void Render()
 {
-	// Clear the window and make it all red
-	SDL_RenderClear( renderer );
-
-	container.Render(renderer );
-
-	// Render the changes above
-	SDL_RenderPresent( renderer);
+	container.Render( );
 }
 // Initialization ++
 // ==================================================================
@@ -103,11 +120,7 @@ bool InitEverything()
 	windowMiddle.x = static_cast< uint32_t > ( windowRect.w * 0.5 );
 	windowMiddle.y = static_cast< uint32_t > ( windowRect.h * 0.5 );
 
-	container.Init( "sketchy.ttf", 38 );
-	container.AddObject( renderer, 24 );
-	container.AddObject( renderer, 42 );
-	container.AddObject( renderer, 2442 );
-	container.AddObject( renderer, 4224 );
+	container.Init( renderer, "sketchy.ttf", 38 );
 
 	return true;
 }

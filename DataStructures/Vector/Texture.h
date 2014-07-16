@@ -25,6 +25,11 @@ struct Texture
 	virtual void Render( SDL_Renderer* renderer ) const;
 	void Update( double delta );
 
+	void IncrementX( int32_t x )
+	{
+		rect.x += x;
+	}
+
 	// Collision detection
 	bool CheckCollision( const Texture &other ) const;
 	bool CheckCollision( const SDL_Rect &other ) const;
@@ -46,6 +51,11 @@ struct Texture
 
 	// Frees previous and sets texture to text
 	void SetTexture( SDL_Texture *text );
+
+	SDL_Texture* GetTexture()
+	{
+		return texture;
+	}
 
 	SDL_Rect GetRect() const;
 	Speed GetSpeed( ) const;
