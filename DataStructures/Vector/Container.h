@@ -35,14 +35,14 @@ struct Container
 			SDL_RenderDrawRect( renderer, &container );
 			SDL_SetRenderDrawColor( renderer, 0, 0, 0, 255 );
 
-			SDL_Rect rect = data[0].GetOuterRect();
+			SDL_Rect rect = originalRect;
 
-			data[0].Render( renderer );
-			for ( auto i = 1 ; i < data.size() ; ++i )
+			for ( auto i = 0 ; i < data.size() ; ++i )
 			{
-				rect.x += itemSize.x + marginSize.x;
 				data[i].SetOuterRect( rect );
 				data[i].Render( renderer );
+
+				rect.x += itemSize.x + marginSize.x;
 			}
 
 			SDL_RenderPresent( renderer);
@@ -78,24 +78,31 @@ struct Container
 
 			// Add item to last free pos ( this is the same as push_back )
 			data[ size++ ].RenderValue( renderer, value );
+			Render();
+			std::this_thread::sleep_for( milliseconds( 500 ) );
 		}
+		// Adds object in a given position
 		void AddObject( int32_t value, int32_t index )
 		{
 			// Chech if we need to expand vector
 			if ( size >= capacity )
 				Reserve( capacity + 5 );
 
-			//data.insert( std::begin( data) + index, CreateItem( renderer, value ) );
-			std::cout << "Setting item " << size << " data size " << data.size() << std::endl;
+			// Move every item one space back
+			// 	Starting at the back
+			// 	Stopping at 'index'
 			for ( auto i = size  - 1; i >= index ; --i )
 			{
-				std::swap( data[i], data[ i +1] );
+				std::swap( data[i], data[ i + 1 ] );
 				Render();
 
 				std::this_thread::sleep_for( milliseconds( 500 ) );
 			}
 
-			data[index].RenderValue( renderer, value );
+			data[ index ].RenderValue( renderer, value );
+			Render();
+			++size;
+			std::this_thread::sleep_for( milliseconds( 500 ) );
 		}
 		void Reserve( int32_t newCapacity )
 		{

@@ -60,6 +60,9 @@ void RunGame()
 		if ( counter == 5 )
 		{
 			container.AddObject( 33, 1 );
+			container.AddObject( 11, 0 );
+			container.AddObject( 0, 0 );
+			container.AddObject( 44, 6 );
 		}
 
 		++counter;
