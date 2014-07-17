@@ -90,7 +90,11 @@ void Container::AddObject( int32_t value, int32_t index )
 
 	// Chech if we need to expand vector
 	if ( size >= capacity )
+	{
+		text.RenderText_Solid( renderer, "Size is equal to or larger than capacity -> increase capacity" );
+		Render( );
 		Reserve( capacity + 5 );
+	}
 
 	// Start in the back and move every item one space back
 	// Stops when 'index' has been moved
@@ -129,8 +133,6 @@ void Container::Reserve( int32_t newCapacity )
 	// Reserve capacity
 	// Documentation : http://en.cppreference.com/w/cpp/container/vector/reserve
 	data.reserve( newCapacity );
-	text.RenderText_Solid( renderer, "Resserving capacity" );
-	Render();
 
 	int32_t capacityIncrease = newCapacity - capacity;
 	int32_t addedItems = 0;
