@@ -94,16 +94,18 @@ void Container::AddObject( int32_t value, int32_t index )
 
 	CheckCapacity( );
 
+	int32_t oldSize = size++;
+	Render( false );
+
 	// Start in the back and move every item one space back
 	// Stops when 'index' has been moved
-	for ( auto i = size - 1; i >= index ; --i )
+	for ( auto i = oldSize - 1; i >= index ; --i )
 	{
 		text.RenderText_Solid( renderer, "Moving elements back" );
 		std::swap( data[i], data[ i + 1 ] );
 		Render();
 	}
 
-	++size;
 	text.RenderText_Solid( renderer, "Inserting..." );
 	Render( );
 	data[ index ].RenderValue( renderer, value );
