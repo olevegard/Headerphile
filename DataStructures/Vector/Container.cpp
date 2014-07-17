@@ -53,7 +53,8 @@ void Container::Render( bool sleep )
 		legendCapacityBar.Render( renderer );
 	}
 
-	text.Render( renderer );
+	caption.Render( renderer );
+	subText.Render( renderer );
 
 	SDL_RenderPresent( renderer);
 
@@ -82,9 +83,9 @@ void Container::CheckCapacity( )
 	// Chech if we need to expand vector
 	if ( size >= capacity )
 	{
-		text.RenderText_Solid( renderer, "Size is equal to or larger than capacity -> increase capacity" );
+		subText.RenderText_Solid( renderer, "Size is equal to or larger than capacity -> increase capacity" );
 		Render( );
-		Reserve( capacity + 5 );
+		Reserve( capacity + 5, false );
 	}
 }
 // Adds object in a given position
@@ -99,18 +100,25 @@ void Container::AddObject( int32_t value, int32_t index )
 
 	// Start in the back and move every item one space back
 	// Stops when 'index' has been moved
-	for ( auto i = oldSize - 1; i >= index ; --i )
+	MoveElementsBack( oldSize, index );
+
+	subText.RenderText_Solid( renderer, "Inserting..." );
+	Render( );
+	data[ index ].RenderValue( renderer, value );
+	subText.RenderText_Solid( renderer, "Done!" );
+	Render();
+}
+void Container::MoveElementsBack( int32_t indexStart, int32_t indexStop )
+{
+	subText.RenderText_Solid( renderer, "Moving elements back" );
+
+	for ( auto i = indexStart - 1; i >= indexStop ; --i )
 	{
-		text.RenderText_Solid( renderer, "Moving elements back" );
 		std::swap( data[i], data[ i + 1 ] );
 		Render();
 	}
 
-	text.RenderText_Solid( renderer, "Inserting..." );
-	Render( );
-	data[ index ].RenderValue( renderer, value );
-	text.RenderText_Solid( renderer, "Done!" );
-	Render();
+	subText.RenderText_Solid( renderer, "-" );
 }
 void Container::RenderInsertionText( int32_t value, int32_t index )
 {
@@ -118,19 +126,26 @@ void Container::RenderInsertionText( int32_t value, int32_t index )
 	{
 		std::stringstream ss;
 		ss << "Inserting : " << value << " into index " << index;
-		text.RenderText_Solid( renderer, ss.str() );
+		caption.RenderText_Solid( renderer, ss.str() );
 	}
 	else
-		text.RenderValue( renderer, "Pushing back : ", value );
+		caption.RenderValue( renderer, "Pushing back : ", value );
 
 	Render();
 }
-void Container::Reserve( int32_t newCapacity )
+void Container::Reserve( int32_t newCapacity, bool renderText )
 {
 	if ( capacity >= newCapacity )
 	{
 		std::cout << "New capacity is lower than current capacity\n";
 		return;
+	}
+
+	if ( renderText )
+	{
+		std::stringstream ss;
+		ss << "Increasing capacity from : " << capacity << " to " << newCapacity;
+		caption.RenderText_Solid( renderer, ss.str() );
 	}
 
 	// Reserve capacity
@@ -155,6 +170,7 @@ bool Container::InitFonts( const std::string &fontName, int32_t fontSize )
 {
 	font = TTF_OpenFont( fontName.c_str(), fontSize );
 	smallFont = TTF_OpenFont( fontName.c_str(), 25 ); 
+	tinyFont = TTF_OpenFont( fontName.c_str(), 18 );
 
 	if ( font == nullptr )
 	{
@@ -166,9 +182,13 @@ bool Container::InitFonts( const std::string &fontName, int32_t fontSize )
 }
 void Container::InitText()
 {
-	text.Init( smallFont, { 255, 255, 0, 255 }, { 0, 0, 0, 255 } );
-	text.SetRect( { container.x + 20, container.y + itemSize.y * 2, 100, 80 } );
-	text.RenderText_Solid( renderer, "Text...." );
+	caption.Init( smallFont, { 255, 255, 0, 255 }, { 0, 0, 0, 255 } );
+	caption.SetRect( { container.x + 20, container.y + itemSize.y * 2, 100, 80 } );
+	caption.RenderText_Solid( renderer, "No action yet..." );
+
+	subText.Init( tinyFont, { 0, 255, 255, 255 }, { 0, 0, 0, 255 } );
+	subText.SetRect( { container.x + 30, container.y + itemSize.y * 2 + 35, 100, 80 } );
+	subText.RenderText_Solid( renderer, "No action yet..." );
 
 	legendSizeBar.Init( smallFont, colorSizeBar, { 0, 0, 0, 255 } );
 	legendSizeBar.SetRect( { 20, container.y + container.h + 40, 0,0 } );

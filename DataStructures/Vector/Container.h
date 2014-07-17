@@ -27,8 +27,9 @@ struct Container
 		void AddObject( int32_t value, int32_t index );
 
 		// Increase capacity of vector ( will add empty items )
-		void Reserve( int32_t newCapacity );
+		void Reserve( int32_t newCapacity, bool renderText = true );
 	private:
+		void MoveElementsBack( int32_t indexStart, int32_t indexStop );
 		void CheckCapacity( );
 		void RenderInsertionText( int32_t value, int32_t index );
 		bool InitFonts( const std::string &fontName, int32_t fontSize );
@@ -49,6 +50,7 @@ struct Container
 		SDL_Renderer* renderer;
 		TTF_Font* font;
 		TTF_Font* smallFont;
+		TTF_Font* tinyFont;
 
 		SDL_Point itemSize = { 66, 66 }; 
 		SDL_Point marginSize = { 5, 5 }; 
@@ -60,6 +62,7 @@ struct Container
 		Texture_Text legendCapacityBar;
 		SDL_Color colorCapacity;
 
-		Texture_Text text;
+		Texture_Text caption; // The main function, like inserting 42 into index 3
+		Texture_Text subText;	// The step along the way, like pushing items back
 		int32_t sleepTime; // Raise after every render
 };
