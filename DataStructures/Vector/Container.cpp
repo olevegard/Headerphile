@@ -77,11 +77,8 @@ void Container::AddObject( int32_t value )
 {
 	AddObject( value, size  );
 }
-// Adds object in a given position
-void Container::AddObject( int32_t value, int32_t index )
+void Container::CheckCapacity( )
 {
-	RenderInsertionText( value, index );
-
 	// Chech if we need to expand vector
 	if ( size >= capacity )
 	{
@@ -89,12 +86,18 @@ void Container::AddObject( int32_t value, int32_t index )
 		Render( );
 		Reserve( capacity + 5 );
 	}
+}
+// Adds object in a given position
+void Container::AddObject( int32_t value, int32_t index )
+{
+	RenderInsertionText( value, index );
+
+	CheckCapacity( );
 
 	// Start in the back and move every item one space back
 	// Stops when 'index' has been moved
 	for ( auto i = size - 1; i >= index ; --i )
 	{
-
 		text.RenderText_Solid( renderer, "Moving elements back" );
 		std::swap( data[i], data[ i + 1 ] );
 		Render();

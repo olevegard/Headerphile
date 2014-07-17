@@ -29,6 +29,7 @@ struct Container
 		// Increase capacity of vector ( will add empty items )
 		void Reserve( int32_t newCapacity );
 	private:
+		void CheckCapacity( );
 		void RenderInsertionText( int32_t value, int32_t index );
 		bool InitFonts( const std::string &fontName, int32_t fontSize );
 		void InitText();
