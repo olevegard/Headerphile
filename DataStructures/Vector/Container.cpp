@@ -35,6 +35,8 @@ void Container::Render( bool sleep )
 	SDL_Rect rect = originalRect;
 	SDL_Point sizePoint = { originalRect.x, originalRect.y };
 	SDL_Point capacityPoint = sizePoint;
+	capacityPoint.y += itemSize.y + ( marginSize.y * 2 );
+
 	for ( auto i = 0 ; i < data.size() ; ++i )
 	{
 		data[i].SetOuterRect( rect );
@@ -160,7 +162,7 @@ bool Container::InitFonts( const std::string &fontName, int32_t fontSize )
 void Container::InitText()
 {
 	text.Init( smallFont, { 255, 255, 0, 255 }, { 0, 0, 0, 255 } );
-	text.SetRect( { container.x + 20, container.y + itemSize.y + 20, 100, 80 } );
+	text.SetRect( { container.x + 20, container.y + itemSize.y * 2, 100, 80 } );
 	text.RenderText_Solid( renderer, "Text...." );
 
 	legendSizeBar.Init( smallFont, colorSizeBar, { 0, 0, 0, 255 } );
