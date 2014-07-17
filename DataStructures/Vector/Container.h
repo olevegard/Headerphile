@@ -1,3 +1,6 @@
+// Container - headerphile.blogspot.no
+// A simple class to show how a vector works
+// Note : the code is messy because this is just inteded to show how a vector works
 #pragma once
 
 #include <SDL2/SDL_ttf.h>
@@ -44,10 +47,17 @@ struct Container
 		SDL_Renderer* renderer;
 		TTF_Font* font;
 		TTF_Font* smallFont;
+
 		SDL_Point itemSize = { 66, 66 }; 
 		SDL_Point marginSize = { 5, 5 }; 
 		SDL_Rect container = { 10, 10, 15, 0 };
 		SDL_Rect originalRect;
+
+		Texture_Text legendSizeBar;
+		SDL_Color colorSizeBar;
+		Texture_Text legendCapacityBar;
+		SDL_Color colorCapacity;
+
 		Texture_Text text;
 		int32_t sleepTime; // Raise after every render
 };
