@@ -1,6 +1,7 @@
 // Container - headerphile.blogspot.no
 // A simple class to show how a vector works
 // Note : the code is messy because this is just inteded to show how a vector works
+// 			Code also contains a lot of Render() calls, this is because we want to flush the status text quite often
 #pragma once
 
 #include <SDL2/SDL_ttf.h>

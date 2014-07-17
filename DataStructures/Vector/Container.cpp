@@ -26,12 +26,6 @@ void Container::Render( bool sleep )
 {
 	SDL_RenderClear( renderer );
 
-	/*
-	SDL_SetRenderDrawColor( renderer, 0, 0, 255, 255 );
-	SDL_RenderDrawRect( renderer, &container );
-	SDL_SetRenderDrawColor( renderer, 0, 0, 0, 255 );
-	*/
-
 	SDL_Rect rect = originalRect;
 	SDL_Point sizePoint = { originalRect.x, originalRect.y };
 	SDL_Point capacityPoint = sizePoint;
@@ -64,7 +58,7 @@ void Container::Render( bool sleep )
 	SDL_RenderPresent( renderer);
 
 	if ( sleep )
-		std::this_thread::sleep_for( milliseconds( sleepTime + 600 ) );
+		std::this_thread::sleep_for( milliseconds( sleepTime ) );
 }
 bool Container::Init( SDL_Renderer* renderer_, const std::string &fontName, int32_t fontSize )
 {
@@ -100,11 +94,15 @@ void Container::AddObject( int32_t value, int32_t index )
 	// Stops when 'index' has been moved
 	for ( auto i = size - 1; i >= index ; --i )
 	{
+
+		text.RenderText_Solid( renderer, "Moving elements back" );
 		std::swap( data[i], data[ i + 1 ] );
 		Render();
 	}
 
 	++size;
+	text.RenderText_Solid( renderer, "Inserting..." );
+	Render( );
 	data[ index ].RenderValue( renderer, value );
 	text.RenderText_Solid( renderer, "Done!" );
 	Render();
