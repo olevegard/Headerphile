@@ -22,6 +22,8 @@ struct Container
 		// Note: no SDL_Renderer, uses SDL_Rendere* member
 		// This is because we need to render inside loops to show step by how insertion and deletion works
 		void Render( bool sleep = true );
+		void RenderMarkers( const SDL_Point &sizePoint, const SDL_Point &capacityPoint );
+		void RenderStatus( );
 
 		// Initializes everything. renderer_ is used to set the member variable.
 		bool Init( SDL_Renderer* renderer_, const std::string &fontName, int32_t fontSize );

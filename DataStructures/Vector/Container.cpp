@@ -27,22 +27,39 @@ void Container::Render( bool sleep )
 
 	SDL_Rect rect = originalRect;
 	SDL_Point sizePoint = { originalRect.x, originalRect.y };
-	SDL_Point capacityPoint = sizePoint;
-	capacityPoint.y += itemSize.y + ( marginSize.y * 2 );
+	SDL_Point capacityPoint = { sizePoint.x, sizePoint.y + itemSize.y + ( marginSize.y * 2 ) };
 
 	for ( auto i = 0 ; i < data.size() ; ++i )
 	{
 		data[i].SetOuterRect( rect );
 		data[i].Render( renderer );
 
-		rect.x += itemSize.x + marginSize.x;
-
-		if ( i < size )
+		// Make sure we only set sizePoint.x past the position of the first free element
+		if ( i == 0 || i == size )
 			sizePoint.x = rect.x;
-		if ( i == ( data.size() - 2 ) )
+
+		// Make sure we only set capacity point when we have reached the last allocated element
+		if ( i == ( data.size() - 1 ) )
 			capacityPoint.x = rect.x;
+
+		rect.x += itemSize.x + marginSize.x;
 	}
 
+	RenderMarkers( sizePoint, capacityPoint );
+	RenderStatus( );
+
+	SDL_RenderPresent( renderer);
+
+	if ( sleep )
+		std::this_thread::sleep_for( milliseconds( sleepTime ) );
+}
+void Container::RenderStatus( )
+{
+	caption.Render( renderer );
+	subText.Render( renderer );
+}
+void Container::RenderMarkers( const SDL_Point &sizePoint, const SDL_Point &capacityPoint )
+{
 	if ( capacity > 0 )
 	{
 		sizeMarker.SetPos( { sizePoint.x, sizePoint.y - 30 } );
@@ -51,14 +68,6 @@ void Container::Render( bool sleep )
 		capacityMarker.SetPos( { capacityPoint.x, capacityPoint.y - 30 } ); 
 		capacityMarker.Render( renderer );
 	}
-
-	caption.Render( renderer );
-	subText.Render( renderer );
-
-	SDL_RenderPresent( renderer);
-
-	if ( sleep )
-		std::this_thread::sleep_for( milliseconds( sleepTime ) );
 }
 bool Container::Init( SDL_Renderer* renderer_, const std::string &fontName, int32_t fontSize )
 {
