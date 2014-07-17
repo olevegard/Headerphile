@@ -12,9 +12,7 @@ using namespace std::chrono;
 Container::Container()
 	:	size( 0 )
 	,	capacity( 0 )
-	,	sleepTime( 500 )
-	,	colorSizeBar( { 0, 255, 0, 255 } )
-	,	colorCapacity( { 0, 0, 255, 255 } )
+	,	sleepTime( 50 )
 {
 }
 Container::~Container()
@@ -46,11 +44,11 @@ void Container::Render( bool sleep )
 
 	if ( capacity > 0 )
 	{
-		legendSizeBar.SetPos( { sizePoint.x, sizePoint.y - 30 } );
-		legendSizeBar.Render( renderer );
+		sizeMarker.SetPos( { sizePoint.x, sizePoint.y - 30 } );
+		sizeMarker.Render( renderer );
 
-		legendCapacityBar.SetPos( { capacityPoint.x, capacityPoint.y - 30 } ); 
-		legendCapacityBar.Render( renderer );
+		capacityMarker.SetPos( { capacityPoint.x, capacityPoint.y - 30 } ); 
+		capacityMarker.Render( renderer );
 	}
 
 	caption.Render( renderer );
@@ -88,7 +86,6 @@ void Container::CheckCapacity( )
 		Reserve( capacity + 5, false );
 	}
 }
-// Adds object in a given position
 void Container::AddObject( int32_t value, int32_t index )
 {
 	RenderInsertionText( value, index );
@@ -190,13 +187,13 @@ void Container::InitText()
 	subText.SetRect( { container.x + 30, container.y + itemSize.y * 2 + 35, 100, 80 } );
 	subText.RenderText_Solid( renderer, "No action yet..." );
 
-	legendSizeBar.Init( smallFont, colorSizeBar, { 0, 0, 0, 255 } );
-	legendSizeBar.SetRect( { 20, container.y + container.h + 40, 0,0 } );
-	legendSizeBar.RenderText_Solid( renderer, "Size" );
+	sizeMarker.Init( smallFont, { 0, 0, 255, 255 }, { 0, 0, 0, 255 } );
+	sizeMarker.SetRect( { 20, container.y + container.h + 40, 0,0 } );
+	sizeMarker.RenderText_Solid( renderer, "Size" );
 
-	legendCapacityBar.Init( smallFont, colorCapacity, { 0, 0, 0, 255 } );
-	legendCapacityBar.SetRect( { 20, container.y + container.h + 40, 0,0 } );
-	legendCapacityBar.RenderText_Solid( renderer, "Capacity" );
+	capacityMarker.Init( smallFont, { 0, 255, 0, 255 }, { 0, 0, 0, 255 } );
+	capacityMarker.SetRect( { 20, container.y + container.h + 40, 0,0 } );
+	capacityMarker.RenderText_Solid( renderer, "Capacity" );
 }
 void Container::InitSize()
 {
