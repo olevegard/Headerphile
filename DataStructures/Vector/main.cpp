@@ -93,7 +93,7 @@ void HandleInput()
 }
 void Render()
 {
-	container.Render( );
+	container.Render( false );
 }
 // Initialization ++
 // ==================================================================

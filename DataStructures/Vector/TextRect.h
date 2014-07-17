@@ -16,15 +16,6 @@ class TextRect : public Texture_Text
 		p.x = rect.x + ( rect.w * 0.5 );
 		p.y = rect.y + ( rect.h * 0.5 );
 		CenterAtPoint( p );
-		/*
-		rect.x = rect_.x;
-		rect.y = rect_.y;
-
-		rect.w += 5;
-		rect.h += 5;
-
-		CheckRect();
-		*/
 	}
 	void CheckRect( )
 	{
@@ -32,13 +23,6 @@ class TextRect : public Texture_Text
 
 		rect.w = std::max( rect.w, innerRect.w );
 		rect.h = std::max( rect.h, innerRect.h );
-
-		/*jjjj
-		if ( rect.w > rect.h )
-			rect.h = rect.w; 
-		else
-			rect.w = rect.h; 
-			*/
 
 		SDL_Point p;
 		p.x = rect.x + ( rect.w * 0.5 );
@@ -69,6 +53,12 @@ class TextRect : public Texture_Text
 	void RenderValue( SDL_Renderer* renderer, int32_t value )
 	{
 		Texture_Text::RenderValue( renderer, value );
+		emptyItem = false;
+		CenterAtPoint( { rect.x + static_cast< int32_t >( rect.w * 0.5 ), rect.y + static_cast< int32_t >( rect.h * 0.5 ) } );
+	}
+	void RenderValue( SDL_Renderer* renderer, const std::string &str  )
+	{
+		Texture_Text::RenderText_Solid( renderer, str );
 		emptyItem = false;
 		CenterAtPoint( { rect.x + static_cast< int32_t >( rect.w * 0.5 ), rect.y + static_cast< int32_t >( rect.h * 0.5 ) } );
 	}
