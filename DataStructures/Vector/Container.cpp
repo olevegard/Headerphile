@@ -8,7 +8,6 @@
 
 using namespace std::chrono;
 
-
 Container::Container()
 	:	size( 0 )
 	,	capacity( 0 )
@@ -18,7 +17,9 @@ Container::Container()
 Container::~Container()
 {
 	// Free our fonts
+	TTF_CloseFont( tinyFont );
 	TTF_CloseFont( font );
+	TTF_CloseFont( smallFont );
 }
 void Container::Render( bool sleep )
 {
