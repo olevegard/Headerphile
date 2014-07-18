@@ -27,6 +27,7 @@ void Container::Render( bool sleep )
 
 	SDL_Rect rect = originalRect;
 	SDL_Point sizePoint = { originalRect.x, originalRect.y };
+	SDL_Point backPoint = { originalRect.x, originalRect.y };
 	SDL_Point capacityPoint = { sizePoint.x, sizePoint.y + itemSize.y + ( marginSize.y * 2 ) };
 
 	for ( auto i = 0 ; i < data.size() ; ++i )
@@ -38,6 +39,9 @@ void Container::Render( bool sleep )
 		if ( i == 0 || i == size )
 			sizePoint.x = rect.x;
 
+		if ( i == ( size - 1) )
+			backPoint.x = rect.x;
+
 		// Make sure we only set capacity point when we have reached the last allocated element
 		if ( i == ( data.size() - 1 ) )
 			capacityPoint.x = rect.x;
@@ -45,7 +49,7 @@ void Container::Render( bool sleep )
 		rect.x += itemSize.x + marginSize.x;
 	}
 
-	RenderMarkers( sizePoint, capacityPoint );
+	RenderMarkers( sizePoint, capacityPoint, backPoint );
 	RenderStatus( );
 
 	SDL_RenderPresent( renderer);
@@ -58,10 +62,13 @@ void Container::RenderStatus( )
 	caption.Render( renderer );
 	subText.Render( renderer );
 }
-void Container::RenderMarkers( const SDL_Point &sizePoint, const SDL_Point &capacityPoint )
+void Container::RenderMarkers( const SDL_Point &sizePoint, const SDL_Point &capacityPoint, const SDL_Point &backPoint )
 {
 	if ( capacity > 0 )
 	{
+		backMarker.SetPos( { backPoint.x, backPoint.y - 30 } );
+		backMarker.Render( renderer );
+
 		sizeMarker.SetPos( { sizePoint.x, sizePoint.y - 30 } );
 		sizeMarker.Render( renderer );
 
@@ -200,6 +207,10 @@ void Container::InitText()
 	sizeMarker.Init( smallFont, { 0, 0, 255, 255 }, { 0, 0, 0, 255 } );
 	sizeMarker.SetRect( { 20, container.y + container.h + 40, 0,0 } );
 	sizeMarker.RenderText_Solid( renderer, "Size" );
+
+	backMarker.Init( smallFont, { 255, 0, 0, 255 }, { 0, 0, 0, 255 } );
+	backMarker.SetRect( { 20, container.y + container.h + 40, 0,0 } );
+	backMarker.RenderText_Solid( renderer, "Back" );
 
 	capacityMarker.Init( smallFont, { 0, 255, 0, 255 }, { 0, 0, 0, 255 } );
 	capacityMarker.SetRect( { 20, container.y + container.h + 40, 0,0 } );

@@ -22,7 +22,7 @@ struct Container
 		// Note: no SDL_Renderer, uses SDL_Rendere* member
 		// This is because we need to render inside loops to show step by how insertion and deletion works
 		void Render( bool sleep = true );
-		void RenderMarkers( const SDL_Point &sizePoint, const SDL_Point &capacityPoint );
+		void RenderMarkers( const SDL_Point &sizePoint, const SDL_Point &capacityPoint, const SDL_Point &backPoint );
 		void RenderStatus( );
 
 		// Initializes everything. renderer_ is used to set the member variable.
@@ -96,6 +96,7 @@ struct Container
 		SDL_Color subTextColor{ 0, 255, 255, 255 };
 
 
+		Texture_Text backMarker;
 		Texture_Text sizeMarker;
 		Texture_Text capacityMarker;
 
