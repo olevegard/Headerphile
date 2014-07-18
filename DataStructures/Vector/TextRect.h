@@ -40,16 +40,13 @@ class TextRect : public Texture_Text
 		{
 			SDL_SetRenderDrawColor( renderer, 255, 0, 0, 255 );
 			SDL_RenderFillRect( renderer, &rect );
+			Texture_Text::Render( renderer );
 		}
 
 		SDL_SetRenderDrawColor( renderer, 255, 255, 255, 255 );
 		SDL_RenderDrawRect( renderer, &rect );
-
 		SDL_SetRenderDrawColor( renderer, 0, 0, 0, 255 );
-
-		Texture_Text::Render( renderer );
 	}
-
 	void RenderValue( SDL_Renderer* renderer, int32_t value )
 	{
 		Texture_Text::RenderValue( renderer, value );
@@ -61,6 +58,10 @@ class TextRect : public Texture_Text
 		Texture_Text::RenderText_Solid( renderer, str );
 		emptyItem = false;
 		CenterAtPoint( { rect.x + static_cast< int32_t >( rect.w * 0.5 ), rect.y + static_cast< int32_t >( rect.h * 0.5 ) } );
+	}
+	void Remove()
+	{
+		emptyItem = true;
 	}
 	SDL_Rect GetOuterRect()
 	{
