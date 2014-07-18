@@ -46,6 +46,9 @@ struct Container
 		// Move all elements back ( as when inserting an element in the iddle of the vector )
 		void MoveElementsBack( int32_t indexStart, int32_t indexStop );
 
+		// Append empty items to the back of the vector ( done when increasing capacity )
+		void AppendEmptyItems( int32_t itemsToAdd );
+
 		// Check that there is free capacity to insert item
 		void CheckCapacity( );
 

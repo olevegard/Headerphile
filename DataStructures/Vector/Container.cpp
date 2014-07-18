@@ -162,23 +162,44 @@ void Container::Reserve( int32_t newCapacity, bool renderText )
 		caption.RenderText_Solid( renderer, ss.str() );
 	}
 
-	// Reserve capacity
-	// Documentation : http://en.cppreference.com/w/cpp/container/vector/reserve
+	// Reserve capacit : http://en.cppreference.com/w/cpp/container/vector/reserve
 	data.reserve( newCapacity );
 
-	int32_t capacityIncrease = newCapacity - capacity;
+	// Now we have reserved the capacity, but we need to add the empty elements
+	AppendEmptyItems( newCapacity );
+}
+void Container::AppendEmptyItems( int32_t newCapacity )
+{
+	int32_t itemsToAdd = newCapacity - capacity ;
 	int32_t addedItems = 0;
 
-	capacity = newCapacity;
-
-	// Now we have reserved the capacity, but we need to add the empty elements
-	while ( addedItems < capacityIncrease )
+	while ( addedItems < itemsToAdd )
 	{
 		data.push_back( CreateEmptyItem() );
 		++addedItems;
 	}
 
+	capacity = newCapacity;
+
 	Render();
+}
+TextRect Container::CreateItem( int32_t value )
+{
+	TextRect item = CreateEmptyItem();
+	item.RenderValue( renderer, value );
+
+	return item;
+}
+TextRect Container::CreateEmptyItem( )
+{
+	TextRect item;
+
+	item.Init( font, { 255, 255, 0, 255 }, { 0, 0, 0, 255 } );
+	item.SetOuterRect( originalRect );
+
+	container.w += marginSize.x + itemSize.x;
+
+	return item;
 }
 bool Container::InitFonts( const std::string &fontName, int32_t fontSize )
 {
