@@ -36,7 +36,7 @@ void Container::Render( bool sleep )
 		data[i].Render( renderer );
 
 		// Make sure we only set sizePoint.x past the position of the first free element
-		if ( i == 0 || i == size )
+		if (  i == size || ( size == data.size() && i == ( size  - 1 ) ) )
 			sizePoint.x = rect.x;
 
 		if ( i == ( size - 1) )
