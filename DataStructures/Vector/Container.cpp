@@ -66,8 +66,11 @@ void Container::RenderMarkers( const SDL_Point &sizePoint, const SDL_Point &capa
 {
 	if ( capacity > 0 )
 	{
-		backMarker.SetPos( { backPoint.x, backPoint.y - 30 } );
-		backMarker.Render( renderer );
+		if ( size > 0 )
+		{
+			backMarker.SetPos( { backPoint.x, backPoint.y - 30 } );
+			backMarker.Render( renderer );
+		}
 
 		sizeMarker.SetPos( { sizePoint.x, sizePoint.y - 30 } );
 		sizeMarker.Render( renderer );
