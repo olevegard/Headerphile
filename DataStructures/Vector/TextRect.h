@@ -71,6 +71,10 @@ class TextRect : public Texture_Text
 	{
 		return Texture::GetTexture();
 	}
+	bool IsEmpty() const
+	{
+		return emptyItem;
+	}
 
 	private:
 	bool emptyItem;

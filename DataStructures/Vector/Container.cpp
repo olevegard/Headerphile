@@ -39,7 +39,7 @@ void Container::Render( bool sleep )
 		if (  i == size || ( size == data.size() && i == ( size  - 1 ) ) )
 			sizePoint.x = rect.x;
 
-		if ( i == ( size - 1) )
+		if ( !data[i].IsEmpty() )
 			backPoint.x = rect.x;
 
 		// Make sure we only set capacity point when we have reached the last allocated element
