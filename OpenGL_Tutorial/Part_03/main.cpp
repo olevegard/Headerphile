@@ -48,7 +48,7 @@ const GLfloat colors[points][floatsPerColor] = {
 GLuint vbo[2], vao[1]; 
 
 // The positons of the position and color data within the VAO
-const uint32_t positionAttributeIndex = 0, colorAttributeIndex = 1;
+const uint32_t positionAttributeIndex = 1, colorAttributeIndex = 0;
 
 // Our wrapper to simplify the shader code
 Shader shader;
@@ -90,7 +90,7 @@ void Render()
 	SDL_GL_SwapWindow(mainWindow);
 
 }
-void SetupBufferObjects()
+bool SetupBufferObjects()
 {
 	// Generate and assign two Vertex Buffer Objects to our handle
 	glGenBuffers(2, vbo);
@@ -101,23 +101,9 @@ void SetupBufferObjects()
 	// Bind our Vertex Array Object as the current used object
 	glBindVertexArray(vao[0]);
 
-	// Positions
-	// ===================
-	// Bind our first VBO as being the active buffer and storing vertex attributes (coordinates)
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-
-	// Copy the vertex data from diamond to our buffer
-	glBufferData(GL_ARRAY_BUFFER, ( points * floatsPerPoint) * sizeof(GLfloat), diamond, GL_STATIC_DRAW);
-
-	// Specify that our coordinate data is going into attribute index 0, and contains three floats per vertex
-	glVertexAttribPointer(positionAttributeIndex, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-	// Enable our attribute within the current VAO
-	glEnableVertexAttribArray(positionAttributeIndex);
-
 	// Colors
 	// =======================
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
 
 	// Copy the vertex data from diamond to our buffer
 	glBufferData(GL_ARRAY_BUFFER, ( points * floatsPerColor) * sizeof(GLfloat), colors, GL_STATIC_DRAW);
@@ -125,17 +111,32 @@ void SetupBufferObjects()
 	// Specify that our coordinate data is going into attribute index 0, and contains three floats per vertex
 	glVertexAttribPointer(colorAttributeIndex, 4, GL_FLOAT, GL_FALSE, 0, 0);
 
+	// ===================
+	// Bind our first VBO as being the active buffer and storing vertex attributes (coordinates)
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+
+	// Copy the vertex data from diamond to our buffer
+	glBufferData(GL_ARRAY_BUFFER, ( points * floatsPerPoint) * sizeof(GLfloat), diamond, GL_STATIC_DRAW);
+
+	// Specify that our coordinate data is going into attribute index 0, and contains three floats per vertex
+	glVertexAttribPointer(positionAttributeIndex, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+	
 	// Note : We didn't enable the colors here!
+	//
+	// Enable our attribute within the current VAO
+	glEnableVertexAttribArray(positionAttributeIndex);
 
 	// Set up shader ( will be covered in the next part )
 	// ===================
-	shader.Init();
+	if (!shader.Init())
+		return false;
 
-	shader.BindAttributeLocation(0, "in_Position");
-	shader.BindAttributeLocation(1, "in_Colors");
 	shader.UseProgram();
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	return true;
 }
 bool Init()
 {
@@ -181,7 +182,7 @@ bool SetOpenGLAttributes()
 
 	// 3.2 is part of the modern versions of OpenGL, but most video cards whould be able to run it
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 
 	// Turn on double buffering with a 24bit Z buffer.
 	// You may need to change this to 16 or 32 for your system
@@ -221,7 +222,9 @@ int main(int argc, char *argv[])
 	SDL_GL_SwapWindow(mainWindow );
 
 	std::cout << "Seting up VBO + VAO..." << std::endl;
-	SetupBufferObjects();
+	if (!SetupBufferObjects())
+		return -1;
+
 	std::cout << "Rendering..." << std::endl;
 	Render();
 
