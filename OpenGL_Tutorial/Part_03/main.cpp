@@ -20,7 +20,7 @@ SDL_Window *mainWindow;
 SDL_GLContext mainContext;
 
 // Our object has 4 points
-const uint32_t points = 4;
+const uint32_t points = 6;
 
 // Each poin has three values ( x, y, z)
 const uint32_t floatsPerPoint = 3;
@@ -30,18 +30,23 @@ const uint32_t floatsPerColor = 4;
 
 // This is the object we'll draw ( a simple square
 const GLfloat diamond[points][floatsPerPoint] = {
-	{ -0.5,  0.5,  0.5 }, // Top left
 	{  0.5,  0.5,  0.5 }, // Top right
 	{  0.5, -0.5,  0.5 }, // Bottom right 
 	{ -0.5, -0.5,  0.5 }, // Bottom left
+	{ -0.5, -0.5,  0.5 }, // Bottom left
+	{ -0.5,  0.5,  0.5 }, // Top left
+	{  0.5,  0.5,  0.5 }, // Top right
 };
 
 // This is the object we'll draw ( a simple square
 const GLfloat colors[points][floatsPerColor] = {
-	{ 0.0, 1.0, 0.0, 1.0 }, // Top left
-	{ 1.0, 1.0, 0.0, 1.0  }, // Top right
+	{ 0.0, 0.0, 1.0, 1.0  }, // Top right
+	{ 0.0, 1.0, 1.0, 1.0 }, // Top left
 	{ 1.0, 0.0, 0.0, 1.0  }, // Bottom right 
-	{ 0.0, 0.0, 1.0, 1.0  }, // Bottom left
+	{ 1.0, 0.0, 0.0, 1.0  }, // Bottom left
+	{ 1.0, 0.0, 0.0, 1.0  }, // Bottom left
+	{ 0.0, 0.0, 1.0, 1.0  }, // Top right
+
 };
 
 // Create variables for storing the ID of our VAO and VBO
@@ -65,30 +70,15 @@ void Render()
 	glClearColor(0.5, 0.5, 0.5, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	// Invoke glDrawArrays telling that our data is a line loop and we want to draw 2-4 vertexes
-	glDrawArrays(GL_LINE_LOOP, 0, 4);
+	// Invoke glDrawArrays telling that our data is a line loop and we want to draw 4 vertexes
+	glDrawArrays(GL_TRIANGLES, 3, 6);
+	// glDrawArrays(GL_LINE_STRIP, 0, points);
 
 	// Swap our buffers to make our changes visible
 	SDL_GL_SwapWindow(mainWindow);
 
 	std::cout << "Press ENTER to render next frame\n";
 	std::cin.ignore();
-
-	// Second, enable the colors and draw a solid square
-	// ===================
-	// Enable our attribute within the current VAO
-	glEnableVertexAttribArray(colorAttributeIndex);
-
-	// Make our background black
-	glClearColor(0.0, 0.0, 0.0, 0.0);
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	// Invoke glDrawArrays telling that our data is a line loop and we want to draw 2-4 vertexes
-	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-
-	// Swap our buffers to make our changes visible
-	SDL_GL_SwapWindow(mainWindow);
-
 }
 bool SetupBufferObjects()
 {
@@ -122,10 +112,9 @@ bool SetupBufferObjects()
 	glVertexAttribPointer(positionAttributeIndex, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 	
-	// Note : We didn't enable the colors here!
-	//
-	// Enable our attribute within the current VAO
+	// Enable our attributes within the current VAO
 	glEnableVertexAttribArray(positionAttributeIndex);
+	glEnableVertexAttribArray(colorAttributeIndex);
 
 	// Set up shader ( will be covered in the next part )
 	// ===================
@@ -170,6 +159,9 @@ bool Init()
 	// Init GLEW
 	glewExperimental = GL_TRUE; 
 	glewInit();
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	return true;
 }

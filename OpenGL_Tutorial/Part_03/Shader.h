@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
  
 #include <string>
+#include <vector>
 #include <sstream>
 #include <fstream>
 #include <iostream>
@@ -11,20 +12,6 @@
 class Shader
 {
 public:
-	std::string ReadFile(const char* file)
-	{
-		// Open file
-		std::ifstream t(file);
- 
-		// Read file into buffer
-		std::stringstream buffer;
-		buffer << t.rdbuf();
- 
-		// Make a std::string and fill it with the contents of buffer
-		std::string fileContent = buffer.str();
- 
-		return fileContent;
-	}
  
 	void BindAttributeLocation(int index, const std::string &attribute)
 	{
@@ -49,81 +36,97 @@ public:
 		// Generate our shader. This is similar to glGenBuffers() and glGenVertexArray(), except that this returns the ID
 		shaderProgram = glCreateProgram();
 
-		if (!LoadVertexShader("tutorial2.vert"))
+		if (!LoadShader("tutorial2.vert", GL_VERTEX_SHADER))
 			return false;
 
-		if (!LoadFragmentShader("tutorial2.frag"))
+		if (!LoadShader("geom.geom", GL_GEOMETRY_SHADER)) return false;
+
+		if (!LoadShader("tutorial2.frag", GL_FRAGMENT_SHADER))
 			return false;
 
 		// All shaders has been create, now we must put them together into one large object
 		return LinkShaders();
 	}
- 
- 
-	bool LoadVertexShader(const std::string &filename)
-	{
-		std::cout << "Linking Vertex shader" << std::endl;
 
-		// Read file as std::string 
-		std::string str = ReadFile(filename.c_str());
+ 	bool LoadShader(const std::string &fileName, GLenum shaderType)
+	{
+		std::cout << "Linking Shader : " << fileName << std::endl;
+
+		int shaderId = CreateShader(fileName, shaderType);
  
-		 // c_str() gives us a const char*, but we need a non-const one
-		char* src = const_cast<char*>( str.c_str());
-		int32_t size = str.length();
-		
-		// Create an empty vertex shader handle
-		vertexshader = glCreateShader(GL_VERTEX_SHADER);
- 
-		// Send the vertex shader source code to OpenGL
-		glShaderSource(vertexshader, 1, &src, &size);
- 
-		// Compile the vertex shader
-		glCompileShader(vertexshader);
- 
-		int wasCompiled = 0;
-		glGetShaderiv(vertexshader, GL_COMPILE_STATUS, &wasCompiled );
- 
-		if (wasCompiled == 0)
+		if (TryCompileShader(shaderId))
 		{
-			PrintShaderCompilationErrorInfo(vertexshader);
-			return false;
+			glAttachShader(shaderProgram, shaderId);
+			shaderIds.push_back(shaderId);
+			return true;
 		}
 
-		glAttachShader(shaderProgram, vertexshader);
-		return true;
+		return false;
 	}
 
-	bool LoadFragmentShader(const std::string &filename)
+	void CleanUp()
 	{
-		std::cout << "Loading Fragment Shader" << std::endl;
+		/* Cleanup all the things we bound and allocated */
+		glUseProgram(0);
 
+		for ( auto i : shaderIds)
+			glDetachShader(shaderProgram, i);
+
+		glDeleteProgram(shaderProgram);
+
+		for ( auto i : shaderIds)
+			glDeleteShader(i);
+	}
+
+private:
+	bool TryCompileShader(int shaderId)
+	{
+		// Compile the vertex shader
+		glCompileShader(shaderId);
+ 
+		int wasCompiled = 0;
+		glGetShaderiv(shaderId, GL_COMPILE_STATUS, &wasCompiled);
+ 
+
+		PrintShaderCompilationErrorInfo(shaderId);
+		if (wasCompiled == 0)
+		{
+			return false;
+		}
+
+		return true;
+	}
+	int CreateShader(const std::string &fileName, GLenum shaderType)
+	{
 		// Read file as std::string 
-		std::string str = ReadFile(filename.c_str());
+		std::string str = ReadFile(fileName.c_str());
  
 		 // c_str() gives us a const char*, but we need a non-const one
 		char* src = const_cast<char*>( str.c_str());
 		int32_t size = str.length();
 		
 		// Create an empty vertex shader handle
-		fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
- 
-		// Send the vertex shader source code to OpenGL
-		glShaderSource(fragmentShader, 1, &src, &size);
- 
-		// Compile the vertex shader
-		glCompileShader(fragmentShader);
- 
-		int wasCompiled = 0;
-		glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &wasCompiled );
- 
-		if (wasCompiled == false)
-		{
-			PrintShaderCompilationErrorInfo(fragmentShader);
-			return false;
-		}
+		int shaderId = glCreateShader(shaderType);
 
-		glAttachShader(shaderProgram, fragmentShader);
-		return true;
+		// Send the vertex shader source code to OpenGL
+		glShaderSource(shaderId , 1, &src, &size);
+
+		return shaderId;
+	}
+
+	std::string ReadFile(const char* file)
+	{
+		// Open file
+		std::ifstream t(file);
+ 
+		// Read file into buffer
+		std::stringstream buffer;
+		buffer << t.rdbuf();
+ 
+		// Make a std::string and fill it with the contents of buffer
+		std::string fileContent = buffer.str();
+ 
+		return fileContent;
 	}
 
 	bool LinkShaders()
@@ -168,8 +171,6 @@ public:
 	// If something went wrong whil compiling the shaders, we'll use this function to find the error
 	void PrintShaderCompilationErrorInfo(int32_t shaderId)
 	{
-		std::cout << "=======================================\n";
-		std::cout << "Shader compilation failed : " << std::endl;
 
 		// Find length of shader info log
 		int maxLength;
@@ -178,31 +179,23 @@ public:
 		// Get shader info log
 		char* shaderInfoLog = new char[maxLength];
 		glGetShaderInfoLog(shaderId, maxLength, &maxLength, shaderInfoLog );
+
+		std::string log = shaderInfoLog;
  
+		if (log.length())
+		{
+			std::cout << "=======================================\n";
+			std::cout <<  shaderInfoLog << std::endl;
+			std::cout << "=======================================\n\n";
+		}
 		// Print shader info log
-		std::cout << "\tError info : " << shaderInfoLog << std::endl;
- 
-		std::cout << "=======================================\n\n";
 		delete shaderInfoLog;
-	}
- 
-	void CleanUp()
-	{
-		/* Cleanup all the things we bound and allocated */
-		glUseProgram(0);
-		glDetachShader(shaderProgram, vertexshader);
-		glDetachShader(shaderProgram, fragmentShader);
-
-		glDeleteProgram(shaderProgram);
-
-
-		glDeleteShader(vertexshader);
-		glDeleteShader(fragmentShader);
 	}
  
 	// The handle to our shader program
 	GLuint shaderProgram;
  
+	std::vector<int32_t> shaderIds;
 	// The handles to the induvidual shader
 	GLuint vertexshader, fragmentShader;
  
