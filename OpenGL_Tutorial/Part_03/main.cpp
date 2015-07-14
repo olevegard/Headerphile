@@ -20,7 +20,7 @@ SDL_Window *mainWindow;
 SDL_GLContext mainContext;
 
 // Our object has 4 points
-const uint32_t points = 6;
+const uint32_t points = 12;
 
 // Each poin has three values ( x, y, z)
 const uint32_t floatsPerPoint = 3;
@@ -30,22 +30,59 @@ const uint32_t floatsPerColor = 4;
 
 // This is the object we'll draw ( a simple square
 const GLfloat diamond[points][floatsPerPoint] = {
-	{  0.5,  0.5,  0.5 }, // Top right
-	{  0.5, -0.5,  0.5 }, // Bottom right 
-	{ -0.5, -0.5,  0.5 }, // Bottom left
-	{ -0.5, -0.5,  0.5 }, // Bottom left
-	{ -0.5,  0.5,  0.5 }, // Top left
-	{  0.5,  0.5,  0.5 }, // Top right
+	{  0.2,  0.2,  0.5 }, // Top right
+	{ -0.2,  0.2,  0.5 }, // Top left
+	{  0.0,  0.0,  0.5 }, // Center
+
+	{  0.2,  0.2,  0.5 }, // Top right
+	{  0.2, -0.2,  0.5 }, // Bottom right 
+	{  0.0,  0.0,  0.5 }, // Center
+
+	{ -0.2, -0.2,  0.5 }, // Bottom left
+	{  0.2, -0.2,  0.5 }, // Bottom right 
+	{  0.0,  0.0,  0.5 }, // Center
+
+	{ -0.2, -0.2,  0.5 }, // Bottom left
+	{ -0.2,  0.2,  0.5 }, // Top left
+	{  0.0,  0.0,  0.5 }, // Center
 };
 
 // This is the object we'll draw ( a simple square
 const GLfloat colors[points][floatsPerColor] = {
-	{ 0.0, 0.0, 1.0, 1.0  }, // Top right
-	{ 0.0, 1.0, 1.0, 1.0 }, // Top left
-	{ 1.0, 0.0, 0.0, 1.0  }, // Bottom right 
-	{ 1.0, 0.0, 0.0, 1.0  }, // Bottom left
-	{ 1.0, 0.0, 0.0, 1.0  }, // Bottom left
-	{ 0.0, 0.0, 1.0, 1.0  }, // Top right
+
+	{  0.5,  0.5,  0.5, 1.0f }, // Top right
+	{  0.5, -0.5,  0.5, 1.0f }, // Bottom right 
+	{  0.0,  0.0,  0.0, 1.0f }, // Center
+
+	{ -0.5,  0.5,  0.5, 1.0f }, // Top left
+	{  0.5,  0.5,  0.5, 1.0f }, // Top right
+	{  0.0,  0.0,  0.0, 1.0f }, // Center
+
+	{ -0.5, -0.5,  0.5, 1.0f }, // Bottom left
+	{  0.5, -0.5,  0.5, 1.0f }, // Bottom right 
+	{  0.0,  0.0,  0.0, 1.0f }, // Center
+
+	{ -0.5, -0.5,  0.5, 1.0f }, // Bottom left
+	{ -0.5,  0.5,  0.5, 1.0f }, // Top left
+	{  0.0,  0.0,  0.0, 1.0f }, // Center
+
+
+	/*
+	{ 0.3, 0.8, 0.7, 1.0 }, // Top right
+	{ 0.5, 0.1, 0.7, 1.0 }, // Top left
+	{ 0.9, 0.7, 0.7, 1.0 }, // Bottom right 
+
+	{ 0.2, 0.9, 0.7, 1.0 }, // Bottom left
+	{ 0.1, 0.5, 0.7, 1.0 }, // Bottom left
+	{ 0.3, 0.7, 0.7, 1.0 }, // Top right
+
+	{ 0.3, 0.8, 0.7, 1.0 }, // Top right
+	{ 0.5, 0.1, 0.7, 1.0 }, // Top left
+	{ 0.9, 0.7, 0.7, 1.0 }, // Bottom right 
+	{ 0.2, 0.9, 0.7, 1.0 }, // Bottom left
+	{ 0.1, 0.5, 0.7, 1.0 }, // Bottom left
+	{ 0.3, 0.7, 0.7, 1.0 }, // Top right
+	*/
 
 };
 
@@ -71,7 +108,7 @@ void Render()
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	// Invoke glDrawArrays telling that our data is a line loop and we want to draw 4 vertexes
-	glDrawArrays(GL_TRIANGLES, 3, 6);
+	glDrawArrays(GL_TRIANGLES, 0, points);
 	// glDrawArrays(GL_LINE_STRIP, 0, points);
 
 	// Swap our buffers to make our changes visible
@@ -174,7 +211,7 @@ bool SetOpenGLAttributes()
 
 	// 3.2 is part of the modern versions of OpenGL, but most video cards whould be able to run it
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 
 	// Turn on double buffering with a 24bit Z buffer.
 	// You may need to change this to 16 or 32 for your system
