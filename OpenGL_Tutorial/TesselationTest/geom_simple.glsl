@@ -37,6 +37,7 @@ void MakeTriangle(vec4 v1, vec4 v2, vec4 v3)
 
 	// Set color of new vertex
 	ex_Color = color[0];
+	ex_Color.x = 1.0f;
 
 	// Create new vertex
 	// Think of gl_Position and ex_Color as a temporary variable
@@ -45,10 +46,12 @@ void MakeTriangle(vec4 v1, vec4 v2, vec4 v3)
 
 	gl_Position = v2;
 	ex_Color = color[1];
+	ex_Color.y = 1.0f;
 	EmitVertex();
 
 	gl_Position = v3;
 	ex_Color = color[2];
+	ex_Color.z = 1.0f;
 	EmitVertex();
 
 	// Tell OpenGL we're done with this triangle

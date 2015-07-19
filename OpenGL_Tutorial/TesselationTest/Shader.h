@@ -72,6 +72,18 @@ public:
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mat[0][0]);
 	}
 
+	GLuint GetUniformLocation(const std::string &str)
+	{
+		return glGetUniformLocation(shaderProgram, str.c_str() );
+	}
+
+	void SetUniform(const std::string &str, GLuint data)
+	{
+		GLuint uniformId = GetUniformLocation(str);
+
+		glUniform1f(uniformId, data); 
+	}
+
 	bool LinkShaders()
 	{
 		// Link. At this point, our shaders will be inspected/optized and the binary code generated

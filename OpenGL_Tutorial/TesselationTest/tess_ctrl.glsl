@@ -11,15 +11,24 @@ uniform float TessLevelOuter;
 
 void main()
 {
-	TessLevelInner = 3;
-	TessLevelOuter = 3;
-
     tcPosition[ID] = vPosition[ID];
 
-    if (ID == 0) {
-        gl_TessLevelInner[0] = TessLevelInner;
-        gl_TessLevelOuter[0] = TessLevelOuter;
-        gl_TessLevelOuter[1] = TessLevelOuter;
-        gl_TessLevelOuter[2] = TessLevelOuter;
+    if (ID == 0)
+	{
+		gl_TessLevelInner[0] = TessLevelInner;
+		gl_TessLevelOuter[0] = TessLevelOuter;
+		gl_TessLevelOuter[1] = TessLevelOuter;
+		gl_TessLevelOuter[2] = TessLevelOuter;
     }
 }
+/*
+
+        gl_TessLevelInner[0] = 3;
+        gl_TessLevelOuter[0] = 2;
+        gl_TessLevelOuter[1] = 2;
+        gl_TessLevelOuter[2] = 2;
+gl_TessLevelInner[0] = TessLevelInner;
+gl_TessLevelOuter[0] = TessLevelOuter;
+gl_TessLevelOuter[1] = TessLevelOuter;
+gl_TessLevelOuter[2] = TessLevelOuter;
+ */

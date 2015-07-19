@@ -75,8 +75,7 @@ class Renderer
 		if (!CreateSimpleShader())
 			return false;
 
-		if (!CreateFurrShader())
-			return false;
+		// if (!CreateFurrShader()) return false;
 
 		return true;
 	}
@@ -86,15 +85,15 @@ class Renderer
 		if (!simpleShader.Init())
 			return false;
 
-		if (!simpleShader.LoadShader("vert.glsl", GL_VERTEX_SHADER))
-			return false;
+		if (!simpleShader.LoadShader("vert.glsl", GL_VERTEX_SHADER)) return false;
 
-		// if (!simpleShader.LoadShader("geom_simple.glsl", GL_GEOMETRY_SHADER))return false;
+		if (!simpleShader.LoadShader("geom_simple.glsl", GL_GEOMETRY_SHADER))return false;
 
-		//if (!simpleShader.LoadShader("tess_ctrl.glsl", GL_TESS_CONTROL_SHADER)) return false;
-		//if (!simpleShader.LoadShader("tess_eval.glsl", GL_TESS_EVALUATION_SHADER)) return false;
+		if (!simpleShader.LoadShader("tess_ctrl.glsl", GL_TESS_CONTROL_SHADER)) return false;
 
-		//if (!simpleShader.LoadShader("frag.glsl", GL_FRAGMENT_SHADER))return false;
+		if (!simpleShader.LoadShader("tess_eval.glsl", GL_TESS_EVALUATION_SHADER)) return false;
+
+		if (!simpleShader.LoadShader("frag.glsl", GL_FRAGMENT_SHADER))return false;
 
 		if (!simpleShader.LinkShaders())
 			return false;
@@ -150,22 +149,26 @@ class Renderer
 		simpleShader.UseProgram();
 		simpleShader.SetMatrix( mvp );
 
-		furShader.UseProgram();
-		furShader.SetMatrix( mvp );
+		// glUniform1f("TessLevelOuter", 3);
+		simpleShader.SetUniform("TessLevelOuter", 22);
+		simpleShader.SetUniform("TessLevelInner", 33);
+
+		//furShader.UseProgram();
+		// furShader.SetMatrix( mvp );
 	}
 
 	void AddShaders(Model &m)
 	{
 		RenderPass simple;
 		simple.shader = simpleShader;
-		simple.renderMode = GL_TRIANGLES;
+		simple.renderMode = GL_PATCHES;//GL_TRIANGLES;
 		simple.doRender = true;
 		m.AddRenderPass(simple);
 
-		RenderPass furr;
-		furr.shader = furShader;
+		//RenderPass furr;
+		//furr.shader = furShader;
 		// furr.renderMode = GL_PATCHES;
-		furr.renderMode = GL_LINE_STRIP;
+		//furr.renderMode = GL_LINE_STRIP;
 		// m.AddRenderPass(furr);
 	}
 

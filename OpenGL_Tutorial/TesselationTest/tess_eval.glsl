@@ -1,20 +1,18 @@
 #version 410 core
 
-layout(quads, equal_spacing, ccw) in;
-
-//quad interpol
-vec4 interpolate(in vec4 v0, in vec4 v1, in vec4 v2, in vec4 v3)
-{
- vec4 a = mix(v0, v1, gl_TessCoord.x);
- vec4 b = mix(v3, v2, gl_TessCoord.x);
- return mix(a, b, gl_TessCoord.y);
-}
+layout(triangles, equal_spacing, cw) in;
+in vec3 tcPosition[];
+out vec3 tePosition;
+out vec3 tePatchDistance;
+uniform mat4 mvp;
 
 void main()
-{ 
- gl_Position = interpolate(
-  gl_in[0].gl_Position, 
-  gl_in[1].gl_Position, 
-  gl_in[2].gl_Position, 
-  gl_in[3].gl_Position);
+{
+    vec3 p0 = gl_TessCoord.x * tcPosition[0];
+    vec3 p1 = gl_TessCoord.y * tcPosition[1];
+    vec3 p2 = gl_TessCoord.z * tcPosition[2];
+    tePatchDistance = gl_TessCoord;
+    tePosition = normalize(p0 + p1 + p2);
+
+    gl_Position = mvp * vec4(tePosition, 1);
 }

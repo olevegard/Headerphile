@@ -62,10 +62,10 @@ class Model
 
 			s.shader.UseProgram();
 			//glPatchParameteri(GL_PATCH_VERTICES, indexes.size());
-			//glPatchParameteri(GL_PATCH_VERTICES, 3);
+			glPatchParameteri(GL_PATCH_VERTICES, 3);
 //16);
 			// glDrawArrays(s.renderMode, 0, positions.size() / 3 );
-			glDrawElements(GL_TRIANGLES, indexes.size(), GL_UNSIGNED_INT, 0 );
+			glDrawElements(s.renderMode, indexes.size(), GL_UNSIGNED_INT, 0 );
 
 
 		}
