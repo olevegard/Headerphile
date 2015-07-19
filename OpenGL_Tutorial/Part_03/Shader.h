@@ -12,36 +12,19 @@
 class Shader
 {
 public:
- 
-	void BindAttributeLocation(int index, const std::string &attribute)
-	{
-		// Bind attribute index 0 (coordinates) to in_Position and attribute index 1 (color) to in_Color
-		// Attribute locations must be setup before calling glLinkProgram
-		glBindAttribLocation(shaderProgram, index, attribute.c_str());
-	}
-
-	uint32_t GetAttributeId(const std::string &attributeName)
-	{
-		return glGetAttribLocation(shaderProgram, attributeName.c_str() );
-	}
- 
-	void UseProgram()
-	{
-		// Load the shader into the rendering pipeline
-		glUseProgram(shaderProgram);
-	}
-
 	bool Init()
 	{
-		// Generate our shader. This is similar to glGenBuffers() and glGenVertexArray(), except that this returns the ID
+		// Generate our shader. This is similar to glGenBuffers() and glGenVertexArray()
+		// except that this returns the ID
 		shaderProgram = glCreateProgram();
 
-		if (!LoadShader("tutorial2.vert", GL_VERTEX_SHADER))
+		if (!LoadShader("vert.glsl", GL_VERTEX_SHADER))
 			return false;
 
-		if (!LoadShader("geom.geom", GL_GEOMETRY_SHADER)) return false;
+		if (!LoadShader("geom.glsl", GL_GEOMETRY_SHADER))
+			return false;
 
-		if (!LoadShader("tutorial2.frag", GL_FRAGMENT_SHADER))
+		if (!LoadShader("frag.glsl", GL_FRAGMENT_SHADER))
 			return false;
 
 		// All shaders has been create, now we must put them together into one large object
@@ -50,7 +33,7 @@ public:
 
  	bool LoadShader(const std::string &fileName, GLenum shaderType)
 	{
-		std::cout << "Linking Shader : " << fileName << std::endl;
+		std::cout << "Loading Shader : " << fileName << std::endl;
 
 		int shaderId = CreateShader(fileName, shaderType);
  
@@ -62,6 +45,12 @@ public:
 		}
 
 		return false;
+	}
+
+	void UseProgram()
+	{
+		// Load the shader into the rendering pipeline
+		glUseProgram(shaderProgram);
 	}
 
 	void CleanUp()
@@ -79,23 +68,22 @@ public:
 	}
 
 private:
+	// Tries to compile the shader. Returns false if something fails
 	bool TryCompileShader(int shaderId)
 	{
 		// Compile the vertex shader
 		glCompileShader(shaderId);
  
+		// Ask OpenGL if the shaders was compiled
 		int wasCompiled = 0;
 		glGetShaderiv(shaderId, GL_COMPILE_STATUS, &wasCompiled);
- 
 
 		PrintShaderCompilationErrorInfo(shaderId);
-		if (wasCompiled == 0)
-		{
-			return false;
-		}
 
-		return true;
+		// Return false if compilation failed
+		return (wasCompiled != 0);
 	}
+	// Create shader and set the source
 	int CreateShader(const std::string &fileName, GLenum shaderType)
 	{
 		// Read file as std::string 
@@ -114,21 +102,6 @@ private:
 		return shaderId;
 	}
 
-	std::string ReadFile(const char* file)
-	{
-		// Open file
-		std::ifstream t(file);
- 
-		// Read file into buffer
-		std::stringstream buffer;
-		buffer << t.rdbuf();
- 
-		// Make a std::string and fill it with the contents of buffer
-		std::string fileContent = buffer.str();
- 
-		return fileContent;
-	}
-
 	bool LinkShaders()
 	{
 		// Link. At this point, our shaders will be inspected/optized and the binary code generated
@@ -145,6 +118,20 @@ private:
 		return isLinked != 0;
 	}
 
+	std::string ReadFile(const char* file)
+	{
+		// Open file
+		std::ifstream t(file);
+ 
+		// Read file into buffer
+		std::stringstream buffer;
+		buffer << t.rdbuf();
+ 
+		// Make a std::string and fill it with the contents of buffer
+		std::string fileContent = buffer.str();
+ 
+		return fileContent;
+	}
 	void PrintShaderLinkingError(int32_t shaderId)
 	{
 		std::cout << "=======================================\n";
