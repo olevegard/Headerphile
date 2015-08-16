@@ -86,20 +86,7 @@ class Model
 		}
 		else if (handler.IsKeyDown(SDLK_LCTRL) || handler.IsKeyDown(SDLK_RCTRL) )
 		{
-			if (handler.IsKeyDown(SDLK_LCTRL))
-				axis *= 1.01;
-			else
-				axis *= 0.99;
-
-			if (axis.x == 0.0f)
-				axis.x = 1.0f;
-
-			if (axis.y == 0.0f)
-				axis.y = 1.0f;
-
-			if (axis.z == 0.0f)
-				axis.z = 1.0f;
-
+			axis = GetAxisForScaling(handler);
 			scale = glm::scale(scale, axis);
 		}
 		else
@@ -116,7 +103,7 @@ class Model
 
 	static glm::vec3 GetAxis(const EventHandler &handler)
 	{
-		glm::vec3 axis;
+		glm::vec3 axis(0.0f);
 		if (handler.IsKeyDown(SDLK_UP))
 			axis.y = -1.0f;
 
@@ -134,6 +121,29 @@ class Model
 
 		if (handler.IsKeyDown(SDLK_s))
 			axis.z = 1.0f;
+
+		return axis;
+	}
+
+	static glm::vec3 GetAxisForScaling(const EventHandler &handler)
+	{
+		float newValue = 1.0f;
+
+		if (handler.IsKeyDown(SDLK_LCTRL))
+			newValue = 1.01f;
+		else
+			newValue = 0.99f;
+
+		glm::vec3 axis(1.0f);
+
+		if (handler.IsKeyDown(SDLK_UP) || handler.IsKeyDown(SDLK_DOWN))
+			axis.y = newValue;
+
+		if (handler.IsKeyDown(SDLK_LEFT) || handler.IsKeyDown(SDLK_RIGHT))
+			axis.x = newValue;
+
+		if (handler.IsKeyDown(SDLK_w) || handler.IsKeyDown(SDLK_s))
+			axis.z = newValue;
 
 		return axis;
 	}
