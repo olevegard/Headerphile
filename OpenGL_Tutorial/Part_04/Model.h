@@ -2,25 +2,10 @@
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
-#include <glm/gtx/rotate_vector.hpp>
 
 #include <vector>
 
 #include "Shader.h"
-#include "../EventHandler.h"
-
-struct RenderPass
-{
-	GLenum renderMode;
-	Shader shader;
-	bool doRender;
-
-	RenderPass()
-		:	doRender(true)
-	{
-
-	}
-};
 
 class Model
 {
@@ -49,118 +34,30 @@ class Model
 		glDrawArrays(GL_TRIANGLES, 0, positions.size() / 3 );
 	}
 
-	void Update(const EventHandler &handler)
-	{
-		if (handler.IsKeyDown(SDLK_r))
-		{
-			ResetMatrix();
-			return;
-		}
-
-		HandleMoveKeys(handler);
-
-		UpdateMatrix();
-	}
-
 	void ResetMatrix()
 	{
-		rotate = glm::mat4(1.0f); 
-		scale = glm::mat4(1.0f); 
-		translate = glm::mat4(1.0f); 
-
 		model = glm::mat4(1.0f); 
 	}
 
-	void HandleMoveKeys(const EventHandler &handler)
+	void Translate(const glm::vec3 &axis)
 	{
-		glm::vec3 axis = GetAxis(handler);
-
-		if ( axis == glm::vec3(0.0f, 0.0f, 0.0f ))
-			return;
-
-		if (handler.IsKeyDown(SDLK_LSHIFT) || handler.IsKeyDown(SDLK_RSHIFT) )
-		{
-			glm::vec3 rotAxis = glm::vec3(axis.y, axis.x, axis.z); 
-
-			rotate *= glm::rotate( 0.1f, rotAxis);
-		}
-		else if (handler.IsKeyDown(SDLK_LCTRL) || handler.IsKeyDown(SDLK_RCTRL) )
-		{
-			axis = GetAxisForScaling(handler);
-			scale = glm::scale(scale, axis);
-		}
-		else
-		{
-			axis *= 0.1;
-			translate *= glm::translate(axis);
-		}
+		model *= glm::translate(axis);
 	}
 
-	void UpdateMatrix()
-	{
-		model = translate * rotate * scale;
-	}
-
-	static glm::vec3 GetAxis(const EventHandler &handler)
-	{
-		glm::vec3 axis(0.0f);
-		if (handler.IsKeyDown(SDLK_UP))
-			axis.y = -1.0f;
-
-		if (handler.IsKeyDown(SDLK_DOWN))
-			axis.y = 1.0f;
-
-		if (handler.IsKeyDown(SDLK_LEFT))
-			axis.x = -1.0f;
-
-		if (handler.IsKeyDown(SDLK_RIGHT))
-			axis.x = 1.0f;
-
-		if (handler.IsKeyDown(SDLK_w))
-			axis.z = -1.0f;
-
-		if (handler.IsKeyDown(SDLK_s))
-			axis.z = 1.0f;
-
-		return axis;
-	}
-
-	static glm::vec3 GetAxisForScaling(const EventHandler &handler)
-	{
-		float newValue = 1.0f;
-
-		if (handler.IsKeyDown(SDLK_LCTRL))
-			newValue = 1.01f;
-		else
-			newValue = 0.99f;
-
-		glm::vec3 axis(1.0f);
-
-		if (handler.IsKeyDown(SDLK_UP) || handler.IsKeyDown(SDLK_DOWN))
-			axis.y = newValue;
-
-		if (handler.IsKeyDown(SDLK_LEFT) || handler.IsKeyDown(SDLK_RIGHT))
-			axis.x = newValue;
-
-		if (handler.IsKeyDown(SDLK_w) || handler.IsKeyDown(SDLK_s))
-			axis.z = newValue;
-
-		return axis;
-	}
-
+	// Cleanup all the things we bound and allocated
 	void CleanUp()
 	{
-		// Cleanup all the things we bound and allocated
-		shader.CleanUp();
-
 		glDisableVertexAttribArray(0);
-		glDeleteBuffers(1, vbo);
+
+		glDeleteBuffers(2, vbo);
+
 		glDeleteVertexArrays(1, vao);
 
 		// Shutdown SDL 2
 		SDL_Quit();
 	}
 
+	// This is where we setup the model like we saw in the first part
 	bool SetupBufferObjects()
 	{
 		positions = ReadFile("positions.txt");
@@ -207,6 +104,8 @@ class Model
 		return true;
 	}
 
+	// A generic function that takes a path as a paramater
+	// Returns the information as a char*
 	static std::vector<GLfloat> ReadFile(const char* file)
 	{
 		// Open file
@@ -239,7 +138,6 @@ class Model
 	std::vector<GLfloat> positions;
 	std::vector<GLfloat> colors;
 
-
 	// Create variables for storing the ID of our VAO and VBO
 	GLuint vbo[2], vao[1]; 
 
@@ -248,9 +146,6 @@ class Model
 
 	// Model matrix : an identity matrix (model will be at the origin)
 	glm::mat4 model;
-	glm::mat4 translate;
-	glm::mat4 scale;
-	glm::mat4 rotate;
 
 	Shader shader;
 };

@@ -16,6 +16,11 @@
 class Shader
 {
 public:
+	Shader()
+		:	matrixIDSet(false)
+	{
+	}
+
 	bool Init()
 	{
 		// Generate our shader. This is similar to glGenBuffers() and glGenVertexArray()
@@ -48,9 +53,9 @@ public:
 		glUseProgram(shaderProgram);
 	}
 
+	// Cleanup all the things we bound and allocated
 	void CleanUp()
 	{
-		/* Cleanup all the things we bound and allocated */
 		glUseProgram(0);
 
 		for ( auto i : shaderIds)
@@ -64,12 +69,17 @@ public:
 
 	void SetMatrix(const glm::mat4 mat)
 	{
-		GLuint MatrixID = glGetUniformLocation(shaderProgram, "mvp");
+		if (!matrixIDSet)
+		{
+			matrixID = glGetUniformLocation(shaderProgram, "mvp");
+			matrixIDSet = true;
+		}
 
 		// Send our transformation to the currently bound shader,
 		// in the "MVP" uniform
 		// For each model you render, since the MVP will be different (at least the M part)
-		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mat[0][0]);
+		glUniformMatrix4fv(matrixID, 1, GL_FALSE, &mat[0][0]);
+
 	}
 
 	bool LinkShaders()
@@ -188,7 +198,10 @@ private:
  
 	// The handle to our shader program
 	GLuint shaderProgram;
- 
+
+	GLuint matrixID;
+	bool matrixIDSet;
+
 	std::vector<int32_t> shaderIds;
 	// The handles to the induvidual shader
 	GLuint vertexshader, fragmentShader;

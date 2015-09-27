@@ -1,36 +1,53 @@
+// Headerphile - Renderer.h
+//
+// This file controls most things related to the Renderer. 
+// Put in a separate class to avoid code cluttering
+
 #pragma once
 
+// C++ standard
 #include <iostream>
 #include <string>
 
+// Headerphile
 #include "Shader.h"
+#include "Model.h"
 
+std::string programName = "Headerphile SDL2 - OpenGL thing";
+
+// OpenGL stuff
 #define GL3_PROTOTYPES 1
 #include <GL/glew.h>
 #include <glm/glm.hpp>
-#include <glm/gtx/rotate_vector.hpp>
 #include <SDL2/SDL.h>
-
-#include "../EventHandler.h"
-
-#include "Model.h"
- 
-
-std::string programName = "Headerphile SDL2 - OpenGL thing";
 
 class Renderer
 {
 	public :
 	Renderer()
 	{
-		projection = glm::perspective(45.0f, 4.0f / 4.0f, 0.1f, 100.0f);
-		view =
-			glm::lookAt
-			(
-			 glm::vec3(0,0,-9), // Camera is at (4,3,3), in World Space
-			 glm::vec3(0,0,0), // and looks at the origin
-			 glm::vec3(0,-1,0)  // Head is up (set to 0,-1,0 to look upside-down)
-			);
+		// Set up our matricies
+		// I strongly encourage you to mess around with the values here and see what they do
+		// It's a lot of fun, and you'll learn a lot
+		// It'll also give you a better sense of what's going on
+		// ...Which will make it easier for you to debug
+
+		// Set up projection matric
+		projection = glm::perspective
+		(
+			45.0f,       // Field of view ( how far out to the sides we can see
+			1.0f / 1.0f, // Aspect ratio ( stretch image in widh or height )
+			0.1f,        // Near plane ( anything close than this will be cut off )
+			100.0f       // Far plane ( anything further away than this will be cut off )
+		);
+
+		// Set up view matric
+		view = glm::lookAt
+		(
+			glm::vec3(0,0,-4), // Camera is at (0,0,-4), in World Space
+			glm::vec3(0,0,0),  // And looks at the origin
+			glm::vec3(0,-1,0)  // Head is up ( set to 0,-1,0 to look upside-down )
+		);
 	}
 	bool Init()
 	{
@@ -68,25 +85,23 @@ class Renderer
 		glewExperimental = GL_TRUE; 
 		glewInit();
 
-		std::cout << "Seting up VBO + VAO..." << std::endl;
-
 		SetOpenGLOptions();
 
-		if (!CreateSimpleShader())
-			return false;
+		//if (!CreateSimpleShader()) return false;
 
 		return true;
 	}
 
-	bool CreateSimpleShader()
+	bool SetUpShader(const std::string &vertex, const std::string &fragment)
 	{
 		if (!simpleShader.Init())
 			return false;
 
-		if (!simpleShader.LoadShader("vert.glsl", GL_VERTEX_SHADER))
+		//if (!simpleShader.LoadShader("vert.glsl", GL_VERTEX_SHADER))
+		if (!simpleShader.LoadShader(vertex, GL_VERTEX_SHADER))
 			return false;
 
-		if (!simpleShader.LoadShader("frag.glsl", GL_FRAGMENT_SHADER))
+		if (!simpleShader.LoadShader(fragment, GL_FRAGMENT_SHADER))
 			return false;
 
 		if (!simpleShader.LinkShaders())
@@ -95,10 +110,9 @@ class Renderer
 		return true;
 	}
 
+	// Do the first step of rendering ( clearing everything )
 	void RenderStart()
 	{
-		// First, render a square without any colors ( all vertexes will be black )
-		// ===================
 		// Make our background black
 		glClearColor(0.5, 0.5, 0.5, 1.0);
 
@@ -106,11 +120,13 @@ class Renderer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
 	}
 
+	// Renders a Model
 	void RenderModel(const Model &model)
 	{
 		model.Render( );
 	}
 
+	// Called at the end to swap the buffers
 	void RenderEnd()
 	{
 		// Swap our buffers to make our changes visible
@@ -120,11 +136,10 @@ class Renderer
 	void SetMatrix( const glm::mat4 &model )
 	{
 		glm::mat4 mvp = projection * view  * model;
-		simpleShader.UseProgram();
 		simpleShader.SetMatrix( mvp );
 	}
 
-	void AddShaders(Model &m)
+	void SetShader(Model &m)
 	{
 		m.SetShader(simpleShader);
 	}
@@ -133,8 +148,6 @@ class Renderer
 	{
 		// Cleanup all the things we bound and allocated
 		simpleShader.CleanUp();
-
-		glDisableVertexAttribArray(0);
 
 		// Delete our OpengL context
 		SDL_GL_DeleteContext(mainContext);
@@ -162,6 +175,7 @@ class Renderer
 	}
 	private:
 
+	// This set our extra OpenGL options we'll need
 	void SetOpenGLOptions()
 	{
 		// Enable blending so that we can have transparanet object
@@ -180,8 +194,8 @@ class Renderer
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
 		// 3.2 is part of the modern versions of OpenGL, but most video cards whould be able to run it
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 4);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 
 		// Turn on double buffering with a 24bit Z buffer.
 		// You may need to change this to 16 or 32 for your system
@@ -199,8 +213,7 @@ class Renderer
 	// Our wrapper to simplify the shader code
 	Shader simpleShader;
 
+	// Matricies
 	glm::mat4 projection;
-
-	// Camera matrix
 	glm::mat4 view;
 };

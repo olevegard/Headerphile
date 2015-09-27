@@ -1,142 +1,105 @@
-// Compile : clang++ main.cpp -o Part_02 -lGL -lSDL2
+// headerphile.com - main.cpp
+// This is the main manager the class that controls everything
+// It doesn't do much on it's own, it just tells the other classes do to stuff
 //
+// Compile : clang++ main.cpp EventHandler.cpp -o Part_04 -lGL -lSDL2 -lGLEW -lstd=c++11
+//
+
 #include <iostream>
-#include <string>
-
-#include "Shader.h"
-
-#define GL3_PROTOTYPES 1
-#include <GL/glew.h>
-#include <glm/glm.hpp>
-#include <glm/gtx/rotate_vector.hpp>
-#include <SDL2/SDL.h>
-
-#include "../EventHandler.h"
 
 #include "Renderer.h"
- 
-#define PROGRAM_NAME "Tutorial2"
+#include "EventHandler.h"
+#include "Math.h"
 
-bool runGame = true;
-
-void PrintSDL_GL_Attributes();
-void CheckSDLError(int line);
-void Render();
-
+// Handles all our SDL2 event ( quit, keydown, ++ )
 EventHandler handler;
+
+// Handles everything related to OpenGL
 Renderer renderer;
 
-glm::mat4 scale = glm::mat4(1.0f);  // Changes for each model !
-glm::mat4 rotate = glm::mat4(1.0f);  // Changes for each model !
-glm::mat4 translate = glm::mat4(1.0f);  // Changes for each model !
-
+// Handles a single model with its vertexes and matrix
 Model model;
 
-bool Init()
-{
-	return renderer.Init();
+void PrintCommands();
+void UpdateModel();
 
+void Render()
+{
+	// Tell Renderer to clear everything
+	renderer.RenderStart();
+
+	// Set the matrix in the model
+	// This has to be done once per model
+	renderer.SetMatrix( model.GetModel() );
+
+	// Render our model
+	renderer.RenderModel(model);
+
+	// Tell our Renderer to swap the buffers
+	renderer.RenderEnd();
 }
 
 void Update()
 {
-	handler.Update();
-
-	runGame = !handler.WasQuit();
-
-
-	model.Update(handler);
-
-	/*
-	glm::mat4 model;
-
-
-	model = translate * rotate * scale;
-	if ( handler.IsKeyDown( SDLK_r ))
+	while ( !handler.WasQuit() )
 	{
-		translate = glm::mat4(1.0f);
-		rotate = glm::mat4(1.0f);
-		scale = glm::mat4(1.0f);
+		// Update our event handler
+		handler.Update();
 
-		model = glm::mat4(1.0f);
+		// Update our model position
+		UpdateModel();
+
+		Render();
 	}
+}
 
-	runGame = !handler.WasQuit();
-	*/
+void UpdateModel()
+{
+	if (handler.IsKeyDown(SDLK_r))
+	{
+		model.ResetMatrix();
+	}
+	else
+	{
+		glm::vec3 axis = Math::GetAxis(handler);
 
-	renderer.SetMatrix( model.GetModel() );
-
-	Render();
+		model.Translate(axis);
+	}
 }
 
 int main(int argc, char *argv[])
 {
-	if (!Init())
+	if ( !renderer.Init() )
 		return -1;
 
-	// Clear our buffer with a grey background
-	// glClearColor(0.5, 0.5, 0.5, 1.0);
-	// glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
+	PrintCommands();
 
-	// SDL_GL_SwapWindow(mainWindow );
+	// Set up our only shader in Shader
+	renderer.SetUpShader("vert.glsl", "frag.glsl");
 
-	std::cout << "Controls :"
-		<< "\n\tRotate left : \t\t\t Left"
-		<< "\n\tRotate right : \t\t\t Right"
-		<< "\n\tRotate up : \t\t\t Up"
-		<< "\n\tRotate down : \t\t\t Down"
-		<< "\n\tRotate clockwise : \t\t w"
-		<< "\n\tRotate counter-clockwise : \t s"
-		<< std::endl;
-
+	// Create the Model
 	if (!model.SetupBufferObjects())
 		return -1;
 
-	renderer.AddShaders(model);
+	// Set the shader 
+	renderer.SetShader(model);
 
-	while (runGame)
-	{
-		Update();
-	}
-
-	std::cout << "Rendering done!\n";
+	// Run our main update loop
+	Update();
 
 	renderer.Cleanup();
 
 	return 0;
 }
 
-void Render()
+void PrintCommands()
 {
-	renderer.RenderStart();
-
-	renderer.RenderModel(model);
-
-	renderer.RenderEnd();
+	std::cout << "Controls :"
+		<< "\n\tMove left : \t\t\t Left"
+		<< "\n\tMove right : \t\t\t Right"
+		<< "\n\tMove up : \t\t\t Up"
+		<< "\n\tMove down : \t\t\t Down"
+		<< "\n\tMove clockwise : \t\t w"
+		<< "\n\tMove counter-clockwise : \t s"
+		<< std::endl;
 }
-
-void CheckSDLError(int line = -1)
-{
-	std::string error = SDL_GetError();
-
-	if (error != "")
-	{
-		std::cout << "SLD Error : " << error << std::endl;
-
-		if (line != -1)
-			std::cout << "\nLine : " << line << std::endl;
-
-		SDL_ClearError();
-	}
-}
-
-void PrintSDL_GL_Attributes()
-{
-	int value = 0;
-	SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &value);
-	std::cout << "SDL_GL_CONTEXT_MAJOR_VERSION : " << value << std::endl;
-
-	SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &value);
-	std::cout << "SDL_GL_CONTEXT_MINOR_VERSION: " << value << std::endl;
-}
-
