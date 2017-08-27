@@ -2,7 +2,7 @@
 // This is the main manager the class that controls everything
 // It doesn't do much on it's own, it just tells the other classes do to stuff
 //
-// Compile : clang++ main.cpp EventHandler.cpp -o Part_04 -lGL -lSDL2 -lGLEW -lstd=c++11
+// Compile : clang++ main.cpp EventHandler.cpp -lSDL2 -lGL -lGLEW -std=c++11 -o Part5
 //
 
 #include <iostream>

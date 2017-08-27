@@ -1,4 +1,5 @@
 #include "EventHandler.h"
+#include <stdexcept>
 
 void EventHandler::Update( )
 {
@@ -29,7 +30,7 @@ void EventHandler::Update( )
 void EventHandler::AddQuitEvent()
 {
 	quit = true;
-	events.emplace_back( Event( EventType::Quit ) );
+	events.push_back( Event( EventType::Quit ) );
 }
 void EventHandler::HandleKeyBoard( const SDL_Event &event )
 {
@@ -171,16 +172,12 @@ MouseButton EventHandler::ConvertMouseButtonToEnum( uint8_t SDLButtonID ) const
 }
 uint8_t EventHandler::ConvertMouseButtonToID( MouseButton button ) const
 {
-	switch ( button )
-	{
-		case MouseButton::Left:
-			return 1;
-		case MouseButton::Middle:
-			return 2;
-		case MouseButton::Right:
-			return 3;
-		default:
-			break;
+	if (button == MouseButton::Left ){
+            return 1;
+	} else if (button == MouseButton::Middle){
+            return 2;
+	} else if (button == MouseButton::Right){
+            return 3;
 	}
 
 	return -1;

@@ -45,13 +45,13 @@ class Model
 
 	void Translate(const glm::vec3 &axis)
 	{
-		translate *= glm::translate(axis); 
+		translate = glm::translate(translate, axis);
 		UpdateMatrix();
 	}
 
-	void Rotate(glm::vec3 axis)
+	void Rotate(glm::vec3 axis, float angle = 0.1)
 	{
-		rotate *= glm::rotate(0.1f, axis);
+		rotate = glm::rotate(rotate, angle, axis);
 		UpdateMatrix();
 	}
 
